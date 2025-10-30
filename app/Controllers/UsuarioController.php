@@ -19,7 +19,7 @@ class UsuarioController extends Controller
 
     public function index(): void
     {
-        $this->requireRole(['admin']);
+        $this->requirePermission('usuarios.manage');
         $users = $this->usuarios->all();
         $this->view('usuarios/index', [
             'usuarios' => $users,
@@ -29,7 +29,7 @@ class UsuarioController extends Controller
 
     public function form(): void
     {
-        $this->requireRole(['admin']);
+        $this->requirePermission('usuarios.manage');
         $id = (int) ($_GET['id'] ?? 0);
         $usuario = $id ? $this->usuarios->find($id) : null;
         $this->view('usuarios/form', [
@@ -40,7 +40,7 @@ class UsuarioController extends Controller
 
     public function save(): void
     {
-        $this->requireRole(['admin']);
+        $this->requirePermission('usuarios.manage');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::validate($this->session, $_POST['_token'] ?? null)) {
             throw new \InvalidArgumentException('Requisição inválida.');
         }
@@ -75,7 +75,7 @@ class UsuarioController extends Controller
 
     public function delete(): void
     {
-        $this->requireRole(['admin']);
+        $this->requirePermission('usuarios.manage');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::validate($this->session, $_POST['_token'] ?? null)) {
             throw new \InvalidArgumentException('Requisição inválida.');
         }
@@ -90,7 +90,7 @@ class UsuarioController extends Controller
 
     public function reset(): void
     {
-        $this->requireRole(['admin']);
+        $this->requirePermission('usuarios.manage');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::validate($this->session, $_POST['_token'] ?? null)) {
             throw new \InvalidArgumentException('Requisição inválida.');
         }

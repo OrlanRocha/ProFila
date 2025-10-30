@@ -18,7 +18,7 @@ class DashboardController extends Controller
 
     public function index(): void
     {
-        $this->requireRole(['admin', 'gestor']);
+        $this->requirePermission('dashboard.view');
         $indicadores = $this->relatorios->indicadoresDiarios();
         $porFila = $this->relatorios->volumePorFila();
         $porDia = $this->relatorios->volumePorDia();

@@ -18,7 +18,7 @@ class RelatorioController extends Controller
 
     public function dashboard(): void
     {
-        $this->requireRole(['admin', 'gestor']);
+        $this->requirePermission('relatorios.view');
         $indicadores = $this->relatorios->indicadoresDiarios();
         $porFila = $this->relatorios->volumePorFila();
         $porDia = $this->relatorios->volumePorDia();

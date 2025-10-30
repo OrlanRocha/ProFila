@@ -1,8 +1,23 @@
+<?php
+$token = $display['token'] ?? '';
+$assigned = ($display['status'] ?? 'pendente') === 'ativo' && !empty($display['unidade_nome']);
+$endpoint = rtrim($config['app']['base_url'] ?? '', '/') . '/sse/stream.php?display=' . urlencode($token);
+$fallback = $url('api/painel/last', ['display' => $token]);
+?>
 <div class="painel-wrapper bg-dark text-white position-relative overflow-hidden">
-    <div class="painel-main text-center py-5">
+    <?php if (!$assigned): ?>
+        <div class="position-absolute top-0 start-0 end-0 bg-warning text-dark text-center py-2 fw-semibold">
+            Este painel aguardando vinculação. IP detectado: <?= htmlspecialchars($ip) ?>.
+            Atribua uma unidade e regra na central de gestão para iniciar as chamadas.
+        </div>
+    <?php endif; ?>
+    <div class="painel-main text-center py-5 mt-5">
         <h1 class="display-1 fw-bold" id="painelCodigo"><?= htmlspecialchars($ultima['codigo'] ?? '--') ?></h1>
         <p class="lead mb-4">Guichê <span id="painelGuiche"><?= htmlspecialchars($ultima['guiche'] ?? '--') ?></span></p>
         <p class="fs-5 text-secondary">Fila: <span id="painelFila"><?= htmlspecialchars($ultima['fila'] ?? '--') ?></span></p>
+        <?php if (!empty($display['unidade_nome'])): ?>
+            <div class="badge bg-info bg-opacity-25 text-info px-4 py-2 rounded-pill">Unidade: <?= htmlspecialchars($display['unidade_nome']) ?></div>
+        <?php endif; ?>
     </div>
     <div class="painel-historico position-absolute bottom-0 start-0 end-0 bg-black bg-opacity-50 py-3">
         <div class="container">
@@ -28,10 +43,10 @@
 <script>
     window.ProFila = window.ProFila || {};
     window.ProFila.painel = {
-        sse: <?= $sse ? 'true' : 'false' ?>,
+        sse: <?= $sse && $assigned ? 'true' : 'false' ?>,
         pollInterval: <?= (int) $pollInterval ?>,
-        endpoint: 'sse/stream.php',
-        fallback: 'index.php?r=api/painel/last',
+        endpoint: '<?= htmlspecialchars($endpoint, ENT_QUOTES) ?>',
+        fallback: '<?= htmlspecialchars($fallback, ENT_QUOTES) ?>',
         history: <?= json_encode(array_map(static function ($item) {
             return [
                 'codigo' => $item['codigo'] ?? '--',

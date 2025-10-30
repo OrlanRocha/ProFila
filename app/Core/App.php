@@ -16,7 +16,7 @@ class App
     public function run(): void
     {
         try {
-            $route = $_GET['r'] ?? 'dashboard/index';
+            $route = $this->resolveRequestedRoute();
             $this->router->dispatch($route);
         } catch (HttpNotFoundException $exception) {
             http_response_code(404);
@@ -31,5 +31,30 @@ class App
                 'trace' => $this->config['app']['debug'] ?? false ? $exception->getTraceAsString() : null,
             ]);
         }
+    }
+
+    private function resolveRequestedRoute(): string
+    {
+        if (!empty($_GET['r'])) {
+            return (string) $_GET['r'];
+        }
+
+        if (!empty($_GET['path'])) {
+            return (string) $_GET['path'];
+        }
+
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        $basePath = UrlGenerator::basePath($this->config);
+        if ($basePath && str_starts_with($uri, $basePath)) {
+            $uri = substr($uri, strlen($basePath));
+        }
+
+        $uri = strtok($uri, '?') ?: '';
+        $uri = trim($uri, '/');
+        if ($uri === '' || $uri === 'index.php') {
+            return 'dashboard/index';
+        }
+
+        return $uri;
     }
 }

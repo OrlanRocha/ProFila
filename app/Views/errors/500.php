@@ -5,5 +5,5 @@
     <?php if (!empty($trace)): ?>
         <pre class="text-start bg-light p-3 rounded border overflow-auto" style="max-height: 300px; font-size: 0.875rem;"><?= htmlspecialchars($trace) ?></pre>
     <?php endif; ?>
-    <a class="btn btn-primary" href="index.php?r=dashboard/index">Voltar ao início</a>
+    <a class="btn btn-primary" href="<?= htmlspecialchars($url('dashboard/index'), ENT_QUOTES) ?>">Voltar ao início</a>
 </div>

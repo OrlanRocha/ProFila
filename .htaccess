@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Ajuste abaixo se o projeto estiver em subdiretório (ex.: /profila)
+    RewriteBase /
+
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    RewriteRule ^$ index.php [L]
+    RewriteRule ^(.+)$ index.php?path=$1 [QSA,L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 /index.php
+</IfModule>

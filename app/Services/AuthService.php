@@ -5,16 +5,19 @@ namespace App\Services;
 
 use App\Core\Session;
 use App\Models\Usuario;
+use App\Models\Permissao;
 
 class AuthService
 {
     private Usuario $usuarios;
+    private Permissao $permissoes;
     private Session $session;
     private const RATE_LIMIT_KEY = 'auth_attempts';
 
     public function __construct(private array $config)
     {
         $this->usuarios = new Usuario($config);
+        $this->permissoes = new Permissao($config);
         $this->session = new Session();
     }
 
@@ -36,11 +39,18 @@ class AuthService
 
         $this->session->set(self::RATE_LIMIT_KEY, ['count' => 0, 'timestamp' => time()]);
         $this->session->regenerate();
+        $permissoes = $this->permissoes->porPapel($usuario['papel']);
+        $habilitadas = array_values(array_map(
+            static fn (array $item): string => $item['chave'],
+            array_filter($permissoes, static fn (array $item): bool => (int) $item['permitido'] === 1)
+        ));
+
         $this->session->set('user', [
             'id' => $usuario['id'],
             'nome' => $usuario['nome'],
             'email' => $usuario['email'],
             'papel' => $usuario['papel'],
+            'permissoes' => $habilitadas,
         ]);
 
         $this->usuarios->recordLogin((int) $usuario['id']);

@@ -15,5 +15,6 @@ return [
         'poll_interval_ms' => 5000,
         'timezone' => 'America/Sao_Paulo',
         'debug' => false,
+        'pretty_urls' => true,
     ],
 ];

@@ -25,7 +25,7 @@ class SenhaController extends Controller
 
     public function emitir(): void
     {
-        $this->requireRole(['admin', 'gestor', 'atendente']);
+        $this->requirePermission('senhas.emit');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Csrf::validate($this->session, $_POST['_token'] ?? null)) {
@@ -33,9 +33,9 @@ class SenhaController extends Controller
             }
 
             $filaId = (int) ($_POST['fila_id'] ?? 0);
-            $prioridade = ($_POST['tipo'] ?? 'normal') === 'prioridade';
-            $resultado = $this->service->emitir($filaId, $prioridade);
-            $this->session->set('flash', 'Senha emitida: ' . $resultado['codigo']);
+            $tipo = (string) ($_POST['tipo'] ?? 'padrao');
+            $resultado = $this->service->emitir($filaId, $tipo);
+            $this->session->set('flash', 'Senha emitida: ' . $resultado['codigo'] . ' (' . strtoupper($resultado['prioridade_tipo']) . ')');
             $this->redirect('senhas/emitir');
         }
 
@@ -47,7 +47,7 @@ class SenhaController extends Controller
 
     public function operacao(): void
     {
-        $this->requireRole(['admin', 'gestor', 'atendente']);
+        $this->requirePermission('senhas.operate');
         $historico = $this->service->historicoPainel();
         $this->view('senhas/operacao', [
             'guiches' => $this->guiches->all(),
@@ -59,12 +59,12 @@ class SenhaController extends Controller
 
     public function proxima(): void
     {
-        $this->requireRole(['admin', 'gestor', 'atendente']);
+        $this->requirePermission('senhas.operate');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::validate($this->session, $_POST['_token'] ?? null)) {
             throw new \InvalidArgumentException('Requisição inválida.');
         }
 
-        $guicheId = (int) ($_GET['guiche'] ?? 0);
+        $guicheId = (int) ($_POST['guiche_id'] ?? $_GET['guiche'] ?? 0);
         $filaId = isset($_POST['fila_id']) ? (int) $_POST['fila_id'] : null;
         $dados = $this->service->chamarProxima($guicheId, $filaId ?: null);
         if ($dados) {
@@ -77,12 +77,12 @@ class SenhaController extends Controller
 
     public function rechamar(): void
     {
-        $this->requireRole(['admin', 'gestor', 'atendente']);
+        $this->requirePermission('senhas.operate');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::validate($this->session, $_POST['_token'] ?? null)) {
             throw new \InvalidArgumentException('Requisição inválida.');
         }
 
-        $guicheId = (int) ($_GET['guiche'] ?? 0);
+        $guicheId = (int) ($_POST['guiche_id'] ?? $_GET['guiche'] ?? 0);
         $dados = $this->service->rechamar($guicheId);
         $this->session->set('flash', $dados ? 'Rechamada: ' . $dados['codigo'] : 'Nenhuma senha para rechamar.');
         $this->redirect('senhas/operacao');
@@ -90,7 +90,7 @@ class SenhaController extends Controller
 
     public function finalizar(): void
     {
-        $this->requireRole(['admin', 'gestor', 'atendente']);
+        $this->requirePermission('senhas.operate');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::validate($this->session, $_POST['_token'] ?? null)) {
             throw new \InvalidArgumentException('Requisição inválida.');
         }
@@ -105,7 +105,7 @@ class SenhaController extends Controller
 
     public function transferir(): void
     {
-        $this->requireRole(['admin', 'gestor']);
+        $this->requirePermission('senhas.operate');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Csrf::validate($this->session, $_POST['_token'] ?? null)) {
             throw new \InvalidArgumentException('Requisição inválida.');
         }

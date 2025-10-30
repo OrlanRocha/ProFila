@@ -35,7 +35,7 @@
                     }).then(result => {
                         if (result.isConfirmed) {
                             const form = document.getElementById('usuarioActions');
-                            form.action = 'index.php?r=usuarios/delete';
+                            form.action = form.dataset.delete;
                             form.querySelector('input[name="id"]').value = id;
                             form.submit();
                         }
@@ -54,7 +54,7 @@
                     }).then(result => {
                         if (result.isConfirmed) {
                             const form = document.getElementById('usuarioActions');
-                            form.action = 'index.php?r=usuarios/reset';
+                            form.action = form.dataset.reset;
                             form.querySelector('input[name="id"]').value = id;
                             form.submit();
                         }
@@ -62,79 +62,7 @@
                 });
             }
 
-            if ($('#filasTable').length) {
-                $('#filasTable').DataTable({
-                    language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
-                    dom: 'Bfrtip',
-                    buttons: ['csv', 'print']
-                });
-
-                $('#filasTable').on('click', 'button[data-action="edit"]', function () {
-                    const data = $(this).closest('tr').data('fila');
-                    const modal = document.getElementById('filaModal');
-                    modal.querySelector('#filaId').value = data.id;
-                    modal.querySelector('#filaNome').value = data.nome;
-                    modal.querySelector('#filaSigla').value = data.sigla;
-                    modal.querySelector('#filaPrioridade').value = data.prioridade_padrao;
-                    modal.querySelector('#filaAtivo').checked = !!Number(data.ativo);
-                    const modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
-                    modalInstance.show();
-                });
-
-                $('#filasTable').on('click', 'button[data-action="delete"]', function () {
-                    const id = $(this).data('id');
-                    Swal.fire({
-                        title: 'Remover fila?',
-                        text: 'Confirme para continuar.',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Remover',
-                        cancelButtonText: 'Cancelar'
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            const form = document.getElementById('filaDelete');
-                            form.querySelector('input[name="id"]').value = id;
-                            form.submit();
-                        }
-                    });
-                });
-            }
-
-            if ($('#guichesTable').length) {
-                $('#guichesTable').DataTable({
-                    language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json' },
-                    dom: 'Bfrtip',
-                    buttons: ['csv', 'print']
-                });
-
-                $('#guichesTable').on('click', 'button[data-action="edit"]', function () {
-                    const data = $(this).closest('tr').data('guiche');
-                    const modal = document.getElementById('guicheModal');
-                    modal.querySelector('#guicheId').value = data.id;
-                    modal.querySelector('#guicheNumero').value = data.numero;
-                    modal.querySelector('#guicheApelido').value = data.apelido || '';
-                    modal.querySelector('#guicheFila').value = data.fila_padrao_id || '';
-                    modal.querySelector('#guicheAtivo').checked = !!Number(data.ativo);
-                    bootstrap.Modal.getOrCreateInstance(modal).show();
-                });
-
-                $('#guichesTable').on('click', 'button[data-action="delete"]', function () {
-                    const id = $(this).data('id');
-                    Swal.fire({
-                        title: 'Remover guichê?',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Remover',
-                        cancelButtonText: 'Cancelar'
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            const form = document.getElementById('guicheDelete');
-                            form.querySelector('input[name="id"]').value = id;
-                            form.submit();
-                        }
-                    });
-                });
-            }
+            // Listagens de filas e guichês possuem scripts dedicados nas próprias páginas.
         }
 
         if (window.ProFila && window.ProFila.dashboard) {
@@ -175,19 +103,6 @@
             }
         }
 
-        const formProxima = document.getElementById('formProxima');
-        const formRechamar = document.getElementById('formRechamar');
-        if (formProxima) {
-            formProxima.addEventListener('submit', (event) => {
-                const guiche = document.getElementById('guicheSelect').value;
-                formProxima.action = 'index.php?r=senhas/proxima&guiche=' + encodeURIComponent(guiche);
-            });
-        }
-        if (formRechamar) {
-            formRechamar.addEventListener('submit', (event) => {
-                const guiche = document.getElementById('guicheSelect').value;
-                formRechamar.action = 'index.php?r=senhas/rechamar&guiche=' + encodeURIComponent(guiche);
-            });
-        }
+        // Fluxos de operação ajustados diretamente nos módulos.
     });
 })();

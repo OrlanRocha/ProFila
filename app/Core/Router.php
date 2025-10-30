@@ -12,6 +12,7 @@ use App\Controllers\PainelController;
 use App\Controllers\RelatorioController;
 use App\Controllers\DashboardController;
 use App\Controllers\ApiController;
+use App\Controllers\PermissaoController;
 
 class Router
 {
@@ -43,10 +44,13 @@ class Router
         $controller = $parts[0] ?? 'dashboard';
         $action = $parts[1] ?? 'index';
 
+        $action = lcfirst(str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $action))));
+
         if (count($parts) > 2) {
             $additional = array_slice($parts, 2);
             foreach ($additional as $segment) {
-                $action .= ucfirst($segment);
+                $normalized = str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $segment)));
+                $action .= $normalized;
             }
         }
 
@@ -65,6 +69,7 @@ class Router
             'relatorios' => new RelatorioController($this->config),
             'dashboard' => new DashboardController($this->config),
             'api' => new ApiController($this->config),
+            'permissoes' => new PermissaoController($this->config),
             default => new DashboardController($this->config),
         };
     }

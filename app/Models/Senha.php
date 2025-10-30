@@ -10,11 +10,13 @@ class Senha extends BaseModel
 {
     public function emitir(array $data): int
     {
-        $stmt = $this->db->prepare('INSERT INTO senhas (codigo, fila_id, prioridade, status, guiche_id, criado_em) VALUES (:codigo, :fila_id, :prioridade, :status, :guiche_id, :criado_em)');
+        $stmt = $this->db->prepare('INSERT INTO senhas (codigo, fila_id, unidade_id, prioridade, prioridade_tipo, status, guiche_id, criado_em) VALUES (:codigo, :fila_id, :unidade_id, :prioridade, :prioridade_tipo, :status, :guiche_id, :criado_em)');
         $stmt->execute([
             'codigo' => $data['codigo'],
             'fila_id' => $data['fila_id'],
+            'unidade_id' => $data['unidade_id'] ?? null,
             'prioridade' => $data['prioridade'],
+            'prioridade_tipo' => $data['prioridade_tipo'] ?? 'padrao',
             'status' => $data['status'],
             'guiche_id' => $data['guiche_id'],
             'criado_em' => $data['criado_em'] ?? (new DateTimeImmutable())->format('Y-m-d H:i:s'),
@@ -25,7 +27,7 @@ class Senha extends BaseModel
 
     public function find(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT s.*, f.nome AS fila_nome, f.sigla AS fila_sigla, g.numero AS guiche_numero, g.apelido AS guiche_apelido FROM senhas s LEFT JOIN filas f ON f.id = s.fila_id LEFT JOIN guiches g ON g.id = s.guiche_id WHERE s.id = :id');
+        $stmt = $this->db->prepare('SELECT s.*, f.nome AS fila_nome, f.sigla AS fila_sigla, u.nome AS unidade_nome, g.numero AS guiche_numero, g.apelido AS guiche_apelido FROM senhas s LEFT JOIN filas f ON f.id = s.fila_id LEFT JOIN unidades u ON u.id = s.unidade_id LEFT JOIN guiches g ON g.id = s.guiche_id WHERE s.id = :id');
         $stmt->execute(['id' => $id]);
         $senha = $stmt->fetch();
 
@@ -51,23 +53,31 @@ class Senha extends BaseModel
         ]);
     }
 
-    public function proximaParaChamada(int $filaId, int $prioridadeMinima = 0): ?array
+    public function proximaParaChamada(int $filaId, array $tiposPermitidos, string $modo): ?array
     {
-        $sql = 'SELECT * FROM senhas WHERE fila_id = :fila AND status = "aguardando" AND prioridade >= :prioridade ORDER BY prioridade DESC, criado_em ASC LIMIT 1 FOR UPDATE';
+        $order = $modo === 'sequencial' ? 'criado_em ASC' : 'prioridade DESC, criado_em ASC';
+        $placeholders = implode(',', array_fill(0, count($tiposPermitidos), '?'));
+        $sql = "SELECT * FROM senhas WHERE fila_id = ? AND status = 'aguardando' AND prioridade_tipo IN ($placeholders) ORDER BY $order LIMIT 1 FOR UPDATE";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            'fila' => $filaId,
-            'prioridade' => $prioridadeMinima,
-        ]);
+        $params = array_merge([$filaId], $tiposPermitidos);
+        $stmt->execute($params);
         $senha = $stmt->fetch();
         return $senha ?: null;
     }
 
-    public function proximaGlobal(): ?array
+    public function proximaGlobal(array $tiposPermitidos, string $modo, ?int $unidadeId = null): ?array
     {
-        $sql = 'SELECT * FROM senhas WHERE status = "aguardando" ORDER BY prioridade DESC, criado_em ASC LIMIT 1 FOR UPDATE';
+        $order = $modo === 'sequencial' ? 'criado_em ASC' : 'prioridade DESC, criado_em ASC';
+        $placeholders = implode(',', array_fill(0, count($tiposPermitidos), '?'));
+        $sql = "SELECT * FROM senhas WHERE status = 'aguardando' AND prioridade_tipo IN ($placeholders)";
+        $params = $tiposPermitidos;
+        if ($unidadeId !== null) {
+            $sql .= ' AND unidade_id = ?';
+            $params[] = $unidadeId;
+        }
+        $sql .= " ORDER BY $order LIMIT 1 FOR UPDATE";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute();
+        $stmt->execute($params);
         $senha = $stmt->fetch();
         return $senha ?: null;
     }
@@ -82,21 +92,39 @@ class Senha extends BaseModel
 
     public function transferir(int $id, int $filaId): void
     {
-        $stmt = $this->db->prepare('UPDATE senhas SET fila_id = :fila, atualizado_em = NOW() WHERE id = :id');
+        $stmt = $this->db->prepare('UPDATE senhas SET fila_id = :fila, unidade_id = (SELECT unidade_id FROM filas WHERE id = :fila), atualizado_em = NOW() WHERE id = :id');
         $stmt->execute(['fila' => $filaId, 'id' => $id]);
     }
 
-    public function historicoRecentes(int $limit = 4): array
+    public function historicoRecentes(int $limit = 4, ?int $unidadeId = null): array
     {
-        $stmt = $this->db->prepare('SELECT s.codigo, s.chamado_em, s.guiche_id, g.numero AS guiche_numero, g.apelido, f.nome AS fila_nome FROM senhas s LEFT JOIN guiches g ON g.id = s.guiche_id LEFT JOIN filas f ON f.id = s.fila_id WHERE s.status IN ("chamada", "em_atendimento", "finalizada") ORDER BY s.chamado_em DESC LIMIT :limite');
-        $stmt->bindValue('limite', $limit, PDO::PARAM_INT);
+        $sql = 'SELECT s.codigo, s.chamado_em, s.guiche_id, g.numero AS guiche_numero, g.apelido, f.nome AS fila_nome FROM senhas s LEFT JOIN guiches g ON g.id = s.guiche_id LEFT JOIN filas f ON f.id = s.fila_id WHERE s.status IN ("chamada", "em_atendimento", "finalizada")';
+        $params = [];
+        if ($unidadeId !== null) {
+            $sql .= ' AND s.unidade_id = ?';
+            $params[] = $unidadeId;
+        }
+        $sql .= ' ORDER BY s.chamado_em DESC LIMIT :limite';
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $index => $value) {
+            $stmt->bindValue($index + 1, $value, PDO::PARAM_INT);
+        }
+        $stmt->bindValue(':limite', $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
-    public function ultimaChamada(): ?array
+    public function ultimaChamada(?int $unidadeId = null): ?array
     {
-        $stmt = $this->db->query('SELECT s.codigo, s.chamado_em, s.guiche_id, g.numero AS guiche_numero, g.apelido, f.nome AS fila_nome FROM senhas s LEFT JOIN guiches g ON g.id = s.guiche_id LEFT JOIN filas f ON f.id = s.fila_id WHERE s.chamado_em IS NOT NULL ORDER BY s.chamado_em DESC LIMIT 1');
+        $sql = 'SELECT s.codigo, s.chamado_em, s.guiche_id, g.numero AS guiche_numero, g.apelido, f.nome AS fila_nome FROM senhas s LEFT JOIN guiches g ON g.id = s.guiche_id LEFT JOIN filas f ON f.id = s.fila_id WHERE s.chamado_em IS NOT NULL';
+        $params = [];
+        if ($unidadeId !== null) {
+            $sql .= ' AND s.unidade_id = ?';
+            $params[] = $unidadeId;
+        }
+        $sql .= ' ORDER BY s.chamado_em DESC LIMIT 1';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         $senha = $stmt->fetch();
         return $senha ?: null;
     }
