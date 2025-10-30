@@ -1,0 +1,22 @@
+body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #f6f8fb;
+}
+.navbar .nav-link {
+    font-weight: 500;
+}
+.card {
+    border-radius: 1rem;
+}
+.table thead th {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+.painel-wrapper {
+    background: radial-gradient(circle at top, #1f2937, #030712 70%);
+    min-height: 100vh;
+}
+.painel-main h1 {
+    letter-spacing: 0.1em;
+}
