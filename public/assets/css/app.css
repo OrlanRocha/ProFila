@@ -1,0 +1,231 @@
+:root {
+    --color-primary: #2563eb;
+    --color-secondary: #1d4ed8;
+    --color-background: #f1f5f9;
+    --color-surface: #ffffff;
+    --color-text: #0f172a;
+    --color-muted: #64748b;
+    --color-success: #16a34a;
+    --color-error: #dc2626;
+    --radius: 0.75rem;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--color-background);
+    color: var(--color-text);
+}
+
+.container {
+    width: min(960px, 92vw);
+    margin: 0 auto;
+}
+
+.app-header {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    padding: 1.5rem 0;
+    color: var(--color-surface);
+}
+
+.app-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.app-nav {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.app-nav a {
+    color: var(--color-surface);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.logout-form {
+    margin: 0;
+}
+
+.logout-form button {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: var(--color-surface);
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.app-footer {
+    margin-top: 3rem;
+    padding: 2rem 0;
+    text-align: center;
+    color: var(--color-muted);
+}
+
+.grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.card {
+    background: var(--color-surface);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: 0 15px 35px -25px rgba(15, 23, 42, 0.4);
+}
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.card--centered {
+    margin: 3rem auto;
+    max-width: 420px;
+}
+
+.form {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.form--inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #cbd5f5;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: var(--color-text);
+}
+
+.btn {
+    background: var(--color-primary);
+    color: var(--color-surface);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 20px -15px rgba(37, 99, 235, 0.8);
+}
+
+.btn--secondary {
+    background: var(--color-secondary);
+}
+
+.btn--link {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    padding: 0;
+    cursor: pointer;
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.alert--info {
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--color-secondary);
+}
+
+.alert--success {
+    background: rgba(22, 163, 74, 0.12);
+    color: var(--color-success);
+}
+
+.alert--error {
+    background: rgba(220, 38, 38, 0.12);
+    color: var(--color-error);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem 0.6rem;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.table thead {
+    background: rgba(148, 163, 184, 0.15);
+}
+
+.table__empty {
+    text-align: center;
+    color: var(--color-muted);
+    font-style: italic;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--color-secondary);
+    font-size: 0.85rem;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.summary__label {
+    display: block;
+    color: var(--color-muted);
+    margin-bottom: 0.25rem;
+}
+
+.summary__value {
+    font-size: 1.85rem;
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .app-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form--inline {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
