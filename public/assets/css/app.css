@@ -4,6 +4,21 @@ body {
     color: #e2e8f0;
 }
 
+.glass-card {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.shadow-xxl {
+    box-shadow: 0 30px 120px rgba(15, 23, 42, 0.55);
+}
+
+.login-hero {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.65), rgba(56, 189, 248, 0.25));
+    min-height: 100vh;
+}
+
 .navbar .nav-link,
 .sidebar-link {
     font-weight: 500;
@@ -49,6 +64,40 @@ body {
     background-color: rgba(148, 163, 184, 0.1);
     border: 1px solid rgba(148, 163, 184, 0.2);
     color: #cbd5f5;
+}
+
+.priority-padrao {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.3), rgba(59, 130, 246, 0.6));
+}
+
+.priority-preferencial {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.35), rgba(249, 115, 22, 0.7));
+}
+
+.priority-80\+ {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.35), rgba(236, 72, 153, 0.7));
+}
+
+.priority-servico {
+    background: linear-gradient(135deg, rgba(45, 212, 191, 0.3), rgba(16, 185, 129, 0.6));
+}
+
+.table-dark tr {
+    vertical-align: middle;
+}
+
+.table-dark td, .table-dark th {
+    border-color: rgba(148, 163, 184, 0.1);
+}
+
+.offcanvas.text-bg-dark {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 64, 175, 0.6));
+}
+
+.icon-stack {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .form-control.bg-dark,

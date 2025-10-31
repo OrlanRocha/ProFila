@@ -13,6 +13,10 @@ use App\Controllers\RelatorioController;
 use App\Controllers\DashboardController;
 use App\Controllers\ApiController;
 use App\Controllers\PermissaoController;
+use App\Controllers\UoController;
+use App\Controllers\ServicoController;
+use App\Controllers\AgendamentoController;
+use App\Controllers\TotemController;
 
 class Router
 {
@@ -70,6 +74,10 @@ class Router
             'dashboard' => new DashboardController($this->config),
             'api' => new ApiController($this->config),
             'permissoes' => new PermissaoController($this->config),
+            'uo' => new UoController($this->config),
+            'servicos' => new ServicoController($this->config),
+            'agendamentos' => new AgendamentoController($this->config),
+            'totem' => new TotemController($this->config),
             default => new DashboardController($this->config),
         };
     }

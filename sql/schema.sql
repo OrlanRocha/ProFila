@@ -15,6 +15,15 @@ CREATE TABLE clientes (
   criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE uo_entidades (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nivel ENUM('I','II','III') NOT NULL,
+  nome VARCHAR(160) NOT NULL,
+  codigo VARCHAR(40) NOT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE unidades (
   id INT AUTO_INCREMENT PRIMARY KEY,
   orgao_id INT NOT NULL,
@@ -23,8 +32,51 @@ CREATE TABLE unidades (
   codigo VARCHAR(32) NOT NULL,
   ativo TINYINT(1) NOT NULL DEFAULT 1,
   criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  uo_nivel_i_id INT NULL,
+  uo_nivel_ii_id INT NULL,
+  uo_nivel_iii_id INT NULL,
   CONSTRAINT fk_unidade_orgao FOREIGN KEY (orgao_id) REFERENCES orgaos(id),
-  CONSTRAINT fk_unidade_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+  CONSTRAINT fk_unidade_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+  CONSTRAINT fk_unidade_uo_i FOREIGN KEY (uo_nivel_i_id) REFERENCES uo_entidades(id),
+  CONSTRAINT fk_unidade_uo_ii FOREIGN KEY (uo_nivel_ii_id) REFERENCES uo_entidades(id),
+  CONSTRAINT fk_unidade_uo_iii FOREIGN KEY (uo_nivel_iii_id) REFERENCES uo_entidades(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE servico_categorias (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(160) NOT NULL,
+  descricao TEXT NULL,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE servicos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  categoria_id INT NULL,
+  nome VARCHAR(160) NOT NULL,
+  descricao TEXT NULL,
+  duracao_minutos INT NOT NULL DEFAULT 0,
+  ativo TINYINT(1) NOT NULL DEFAULT 1,
+  criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_servico_categoria FOREIGN KEY (categoria_id) REFERENCES servico_categorias(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE agendamentos (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(160) NOT NULL,
+  documento VARCHAR(40) NULL,
+  contato VARCHAR(80) NULL,
+  prioridade_tipo ENUM('padrao','preferencial','80+','servico') NOT NULL DEFAULT 'padrao',
+  categoria VARCHAR(120) NULL,
+  servico_id INT NULL,
+  unidade_id INT NULL,
+  data_agendada DATE NULL,
+  hora_agendada TIME NULL,
+  observacoes TEXT NULL,
+  origem VARCHAR(30) NOT NULL DEFAULT 'interno',
+  criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_agendamento_servico FOREIGN KEY (servico_id) REFERENCES servicos(id),
+  CONSTRAINT fk_agendamento_unidade FOREIGN KEY (unidade_id) REFERENCES unidades(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE usuarios (
@@ -157,8 +209,22 @@ INSERT INTO orgaos (nome, sigla) VALUES
 INSERT INTO clientes (nome, documento) VALUES
 ('Prefeitura Municipal', '11.222.333/0001-44');
 
-INSERT INTO unidades (orgao_id, cliente_id, nome, codigo) VALUES
-(1, 1, 'Unidade Central', 'UO-CENTRAL');
+INSERT INTO uo_entidades (nivel, nome, codigo) VALUES
+('I', 'Secretaria Geral', 'UO-I-001'),
+('II', 'Coordenadoria Metropolitana', 'UO-II-002'),
+('III', 'Posto Central', 'UO-III-003');
+
+INSERT INTO servico_categorias (nome, descricao) VALUES
+('Documentos', 'Emissão e regularização de documentos civis'),
+('Veículos', 'Serviços relacionados a licenciamento e CNH');
+
+INSERT INTO servicos (categoria_id, nome, descricao, duracao_minutos) VALUES
+(1, 'RG - 1ª via', 'Primeira via do documento de identidade', 20),
+(1, 'RG - 2ª via', 'Reemissão de documento de identidade', 15),
+(2, 'Renovação de CNH', 'Renovação da carteira de motorista', 25);
+
+INSERT INTO unidades (orgao_id, cliente_id, nome, codigo, uo_nivel_i_id, uo_nivel_ii_id, uo_nivel_iii_id) VALUES
+(1, 1, 'Unidade Central', 'UO-CENTRAL', 1, 2, 3);
 
 INSERT INTO usuarios (nome, email, senha_hash, papel) VALUES
 ('Admin', 'admin@local', '$2y$12$BiIwrOx.S/Y6xhKfyw.X7O2NnSsrhC0BBLYqucjO8rmsSmAj6keDC', 'admin');
@@ -192,6 +258,9 @@ INSERT INTO guiches (unidade_id, numero, apelido, fila_padrao_id, ativo, modo_at
 
 INSERT INTO guiche_usuarios (guiche_id, usuario_id, perfil) VALUES
 (1, 1, 'supervisor');
+
+INSERT INTO agendamentos (nome, documento, contato, prioridade_tipo, categoria, servico_id, unidade_id, data_agendada, hora_agendada, origem)
+VALUES ('Maria Ferreira', '123.456.789-00', '(11) 99999-0000', 'preferencial', 'Documentos', 1, 1, CURDATE(), '10:30', 'interno');
 
 INSERT INTO papel_permissoes (papel, permissao_id, permitido)
 SELECT 'admin', id, 1 FROM permissoes;

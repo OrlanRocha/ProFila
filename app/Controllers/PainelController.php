@@ -11,6 +11,7 @@ use App\Models\PainelRegra;
 use App\Models\Unidade;
 use App\Models\Orgao;
 use App\Models\Cliente;
+use App\Models\Uo;
 
 class PainelController extends Controller
 {
@@ -20,6 +21,7 @@ class PainelController extends Controller
     private Unidade $unidades;
     private Orgao $orgaos;
     private Cliente $clientes;
+    private Uo $uo;
 
     public function __construct(array $config)
     {
@@ -30,6 +32,7 @@ class PainelController extends Controller
         $this->unidades = new Unidade($config);
         $this->orgaos = new Orgao($config);
         $this->clientes = new Cliente($config);
+        $this->uo = new Uo($config);
     }
 
     public function display(): void
@@ -63,6 +66,9 @@ class PainelController extends Controller
             'orgaos' => $this->orgaos->all(),
             'clientes' => $this->clientes->all(),
             'regras' => $this->regras->all(),
+            'uoI' => $this->uo->porNivel('I'),
+            'uoII' => $this->uo->porNivel('II'),
+            'uoIII' => $this->uo->porNivel('III'),
             'token' => Csrf::token($this->session),
         ]);
     }
@@ -116,6 +122,9 @@ class PainelController extends Controller
                     'nome' => trim((string) $_POST['nome']),
                     'codigo' => trim((string) $_POST['codigo']),
                     'ativo' => 1,
+                    'uo_nivel_i_id' => $_POST['uo_nivel_i_id'] !== '' ? (int) $_POST['uo_nivel_i_id'] : null,
+                    'uo_nivel_ii_id' => $_POST['uo_nivel_ii_id'] !== '' ? (int) $_POST['uo_nivel_ii_id'] : null,
+                    'uo_nivel_iii_id' => $_POST['uo_nivel_iii_id'] !== '' ? (int) $_POST['uo_nivel_iii_id'] : null,
                 ]);
                 $this->session->set('flash', 'Unidade cadastrada com sucesso.');
                 break;

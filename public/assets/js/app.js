@@ -14,6 +14,14 @@
         if (window.jQuery) {
             const $ = window.jQuery;
 
+            const dataTableDefaults = {
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+                },
+                dom: 'Bfrtip',
+                buttons: ['csv', 'print']
+            };
+
             if ($('#usuariosTable').length) {
                 $('#usuariosTable').DataTable({
                     language: {
@@ -99,6 +107,23 @@
                         }]
                     },
                     options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            if ($('#servicosTable').length) {
+                $('#servicosTable').DataTable({
+                    ...dataTableDefaults,
+                    order: [[1, 'asc']]
+                });
+            }
+
+            if ($('#agendamentosTable').length) {
+                $('#agendamentosTable').DataTable({
+                    ...dataTableDefaults,
+                    order: [[3, 'desc']],
+                    columnDefs: [
+                        { targets: [3], type: 'date-eu' }
+                    ]
                 });
             }
         }

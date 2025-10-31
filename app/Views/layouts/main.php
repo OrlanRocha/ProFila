@@ -33,10 +33,11 @@ $isActive = static fn (string $prefix) => str_starts_with($requested, trim($pref
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5/bootstrap-4.min.css">
     <link rel="stylesheet" href="<?= htmlspecialchars($baseAssets . '/public/assets/css/app.css', ENT_QUOTES) ?>">
     <style>
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f172a, #1d1b4b); min-height: 100vh; }
-        .app-shell { backdrop-filter: blur(12px); background: rgba(15, 23, 42, 0.75); box-shadow: 0 15px 45px rgba(15, 23, 42, 0.5); border-radius: 24px; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f172a, #1d4ed8 55%, #7c3aed); min-height: 100vh; }
+        .app-shell { backdrop-filter: blur(18px); background: rgba(15, 23, 42, 0.8); box-shadow: 0 35px 80px rgba(15, 23, 42, 0.55); border-radius: 28px; }
         .navbar-brand span { color: #38bdf8; }
-        .sidebar-link { border-radius: 12px; }
+        .sidebar-link { border-radius: 12px; transition: background .25s ease, transform .25s ease; }
+        .sidebar-link:hover { transform: translateX(4px); }
         .sidebar-link.active { background: rgba(56, 189, 248, 0.15); color: #38bdf8 !important; }
         main { color: #e2e8f0; }
         footer { color: rgba(226, 232, 240, 0.65); }
@@ -92,6 +93,19 @@ $isActive = static fn (string $prefix) => str_starts_with($requested, trim($pref
                                 <a class="nav-link text-white sidebar-link <?= $isActive('painel') ? 'active' : '' ?>" href="<?= htmlspecialchars($url('painel/index'), ENT_QUOTES) ?>">
                                     <i class="bi bi-display me-2"></i>Painéis
                                 </a>
+                                <a class="nav-link text-white sidebar-link <?= $isActive('uo') ? 'active' : '' ?>" href="<?= htmlspecialchars($url('uo/index'), ENT_QUOTES) ?>">
+                                    <i class="bi bi-diagram-3 me-2"></i>UO (I, II, III)
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($can('filas.manage')): ?>
+                                <a class="nav-link text-white sidebar-link <?= $isActive('servicos') ? 'active' : '' ?>" href="<?= htmlspecialchars($url('servicos/index'), ENT_QUOTES) ?>">
+                                    <i class="bi bi-list-check me-2"></i>Serviços
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($can('senhas.emit')): ?>
+                                <a class="nav-link text-white sidebar-link <?= $isActive('agendamentos') ? 'active' : '' ?>" href="<?= htmlspecialchars($url('agendamentos/index'), ENT_QUOTES) ?>">
+                                    <i class="bi bi-calendar-event me-2"></i>Agendamentos
+                                </a>
                             <?php endif; ?>
                             <?php if ($can('senhas.emit')): ?>
                                 <a class="nav-link text-white sidebar-link <?= $isActive('senhas/emitir') ? 'active' : '' ?>" href="<?= htmlspecialchars($url('senhas/emitir'), ENT_QUOTES) ?>">
@@ -105,6 +119,9 @@ $isActive = static fn (string $prefix) => str_starts_with($requested, trim($pref
                             <?php endif; ?>
                             <a class="nav-link text-white sidebar-link" href="<?= htmlspecialchars($url('painel/display'), ENT_QUOTES) ?>" target="_blank">
                                 <i class="bi bi-tv me-2"></i>Painel Público
+                            </a>
+                            <a class="nav-link text-white sidebar-link" href="<?= htmlspecialchars($url('totem/index'), ENT_QUOTES) ?>" target="_blank">
+                                <i class="bi bi-tablet-landscape me-2"></i>Modo Totem
                             </a>
                         <?php endif; ?>
                     </nav>

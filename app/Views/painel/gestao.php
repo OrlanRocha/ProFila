@@ -153,6 +153,35 @@
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            <div class="col-12">
+                                <label class="form-label">Vinculações por nível</label>
+                                <div class="row g-2">
+                                    <div class="col-sm-4">
+                                        <select name="uo_nivel_i_id" class="form-select bg-dark text-white border-secondary">
+                                            <option value="">UO nível I</option>
+                                            <?php foreach ($uoI as $entidade): ?>
+                                                <option value="<?= (int) $entidade['id'] ?>"><?= htmlspecialchars($entidade['nome']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select name="uo_nivel_ii_id" class="form-select bg-dark text-white border-secondary">
+                                            <option value="">UO nível II</option>
+                                            <?php foreach ($uoII as $entidade): ?>
+                                                <option value="<?= (int) $entidade['id'] ?>"><?= htmlspecialchars($entidade['nome']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select name="uo_nivel_iii_id" class="form-select bg-dark text-white border-secondary">
+                                            <option value="">UO nível III</option>
+                                            <?php foreach ($uoIII as $entidade): ?>
+                                                <option value="<?= (int) $entidade['id'] ?>"><?= htmlspecialchars($entidade['nome']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-8">
                                 <label class="form-label">Nome da unidade</label>
                                 <input type="text" name="nome" class="form-control bg-dark text-white border-secondary" required>

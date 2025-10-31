@@ -8,9 +8,13 @@ TRUNCATE TABLE guiches;
 TRUNCATE TABLE filas;
 TRUNCATE TABLE painel_displays;
 TRUNCATE TABLE painel_regras;
+TRUNCATE TABLE agendamentos;
+TRUNCATE TABLE servicos;
+TRUNCATE TABLE servico_categorias;
 TRUNCATE TABLE papel_permissoes;
 TRUNCATE TABLE permissoes;
 TRUNCATE TABLE usuarios;
+TRUNCATE TABLE uo_entidades;
 TRUNCATE TABLE unidades;
 TRUNCATE TABLE clientes;
 TRUNCATE TABLE orgaos;
@@ -24,10 +28,25 @@ INSERT INTO clientes (id, nome, documento, ativo) VALUES
 (1, 'Prefeitura Municipal', '11.222.333/0001-44', 1),
 (2, 'Câmara Municipal', '55.666.777/0001-99', 1);
 
-INSERT INTO unidades (id, orgao_id, cliente_id, nome, codigo, ativo) VALUES
-(1, 1, 1, 'Unidade Central', 'UO-CENTRAL', 1),
-(2, 1, 1, 'Unidade Norte', 'UO-NORTE', 1),
-(3, 2, 2, 'Posto de Saúde 1', 'UO-SA1', 1);
+INSERT INTO uo_entidades (id, nivel, nome, codigo, ativo) VALUES
+(1, 'I', 'Secretaria Geral', 'UO-I-001', 1),
+(2, 'II', 'Coordenadoria Metropolitana', 'UO-II-002', 1),
+(3, 'III', 'Posto Central', 'UO-III-003', 1),
+(4, 'III', 'Posto Norte', 'UO-III-004', 1);
+
+INSERT INTO unidades (id, orgao_id, cliente_id, nome, codigo, ativo, uo_nivel_i_id, uo_nivel_ii_id, uo_nivel_iii_id) VALUES
+(1, 1, 1, 'Unidade Central', 'UO-CENTRAL', 1, 1, 2, 3),
+(2, 1, 1, 'Unidade Norte', 'UO-NORTE', 1, 1, 2, 4),
+(3, 2, 2, 'Posto de Saúde 1', 'UO-SA1', 1, NULL, NULL, NULL);
+
+INSERT INTO servico_categorias (id, nome, descricao, ativo) VALUES
+(1, 'Documentos', 'Emissão e regularização de documentos civis', 1),
+(2, 'Veículos', 'Serviços relacionados a CNH e licenciamento', 1);
+
+INSERT INTO servicos (id, categoria_id, nome, descricao, duracao_minutos, ativo) VALUES
+(1, 1, 'RG - 1ª via', 'Primeira via do documento de identidade', 20, 1),
+(2, 1, 'RG - 2ª via', 'Reemissão de documento de identidade', 15, 1),
+(3, 2, 'Renovação de CNH', 'Processo completo de renovação', 25, 1);
 
 INSERT INTO usuarios (id, nome, email, senha_hash, papel, ativo) VALUES
 (1, 'Ana Ribeiro', 'ana@prefeitura.local', '$2y$12$BiIwrOx.S/Y6xhKfyw.X7O2NnSsrhC0BBLYqucjO8rmsSmAj6keDC', 'admin', 1),
@@ -75,6 +94,10 @@ INSERT INTO guiche_usuarios (guiche_id, usuario_id, perfil) VALUES
 (2, 4, 'atendente'),
 (3, 3, 'prioritario'),
 (5, 4, 'saude_preferencial');
+
+INSERT INTO agendamentos (id, nome, documento, contato, prioridade_tipo, categoria, servico_id, unidade_id, data_agendada, hora_agendada, origem) VALUES
+(1, 'Maria Ferreira', '123.456.789-00', '(11) 99999-0000', 'preferencial', 'Documentos', 1, 1, CURDATE(), '10:30', 'interno'),
+(2, 'João Mendes', '987.654.321-00', '(11) 98888-1212', 'padrao', 'Veículos', 3, 2, CURDATE() + INTERVAL 1 DAY, '11:00', 'totem');
 
 INSERT INTO papel_permissoes (papel, permissao_id, permitido) VALUES
 ('admin', 1, 1),('admin', 2, 1),('admin', 3, 1),('admin', 4, 1),('admin', 5, 1),('admin', 6, 1),('admin', 7, 1),('admin', 8, 1),('admin', 9, 1),('admin', 10, 1),
