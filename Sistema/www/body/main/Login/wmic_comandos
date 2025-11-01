@@ -1,2 +1,0 @@
-# Ver programas instalados
-wmic PRODUCT get name, vendor, version /value
