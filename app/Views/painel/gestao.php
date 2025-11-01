@@ -1,3 +1,15 @@
+<?php
+/** @var array $displays */
+/** @var array $unidades */
+/** @var array $orgaos */
+/** @var array $clientes */
+/** @var array $regras */
+/** @var array $uoI */
+/** @var array $uoII */
+/** @var array $uoIII */
+/** @var callable $url */
+/** @var string $token */
+?>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="h3 fw-semibold text-white">Gestão de Painéis Digitais</h1>
@@ -15,15 +27,80 @@
 </ul>
 <div class="tab-content">
     <div class="tab-pane fade show active" id="pane-displays" role="tabpanel">
+        <div class="filter-toolbar mb-4">
+            <form id="displayFilters" class="row g-3 align-items-end" onsubmit="return false;">
+                <div class="col-md-3">
+                    <label class="form-label" for="filtroPainelOrgao">Órgão</label>
+                    <select class="form-select bg-dark" id="filtroPainelOrgao" data-display-filter="orgao">
+                        <option value="">Todos</option>
+                        <?php foreach ($orgaos as $orgao): ?>
+                            <option value="<?= (int) $orgao['id'] ?>"><?= htmlspecialchars($orgao['nome']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="filtroPainelCliente">Cliente</label>
+                    <select class="form-select bg-dark" id="filtroPainelCliente" data-display-filter="cliente">
+                        <option value="">Todos</option>
+                        <?php foreach ($clientes as $cliente): ?>
+                            <option value="<?= (int) $cliente['id'] ?>"><?= htmlspecialchars($cliente['nome']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="filtroPainelUoI">UO nível I</label>
+                    <select class="form-select bg-dark" id="filtroPainelUoI" data-display-filter="uo_i">
+                        <option value="">Todas</option>
+                        <?php foreach ($uoI as $uo): ?>
+                            <option value="<?= (int) $uo['id'] ?>"><?= htmlspecialchars($uo['nome']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="filtroPainelUoII">UO nível II</label>
+                    <select class="form-select bg-dark" id="filtroPainelUoII" data-display-filter="uo_ii">
+                        <option value="">Todas</option>
+                        <?php foreach ($uoII as $uo): ?>
+                            <option value="<?= (int) $uo['id'] ?>"><?= htmlspecialchars($uo['nome']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="filtroPainelUoIII">UO nível III</label>
+                    <select class="form-select bg-dark" id="filtroPainelUoIII" data-display-filter="uo_iii">
+                        <option value="">Todas</option>
+                        <?php foreach ($uoIII as $uo): ?>
+                            <option value="<?= (int) $uo['id'] ?>"><?= htmlspecialchars($uo['nome']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="filtroPainelStatus">Status</label>
+                    <select class="form-select bg-dark" id="filtroPainelStatus" data-display-filter="status">
+                        <option value="">Todos</option>
+                        <option value="ativo">Ativo</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="button" class="btn btn-primary flex-grow-1" id="aplicarFiltroPainel"><i class="bi bi-search"></i> Pesquisar</button>
+                    <button type="button" class="btn btn-outline-light" id="limparFiltroPainel">Limpar</button>
+                </div>
+            </form>
+        </div>
         <div class="table-responsive rounded-4 overflow-hidden shadow-sm">
             <table class="table table-dark table-striped align-middle mb-0" id="tabelaDisplays">
                 <thead>
                     <tr>
                         <th>IP</th>
                         <th>Apelido</th>
-                        <th>Unidade</th>
                         <th>Órgão</th>
                         <th>Cliente</th>
+                        <th>Unidade</th>
+                        <th>UO I</th>
+                        <th>UO II</th>
+                        <th>UO III</th>
                         <th>Regra</th>
                         <th>Status</th>
                         <th>Último visto</th>
@@ -32,22 +109,28 @@
                 </thead>
                 <tbody>
                 <?php foreach ($displays as $display): ?>
-                    <tr>
+                    <tr data-orgao="<?= (int) ($display['orgao_id'] ?? 0) ?>" data-cliente="<?= (int) ($display['cliente_id'] ?? 0) ?>" data-uo-i="<?= (int) ($display['uo_nivel_i_id'] ?? 0) ?>" data-uo-ii="<?= (int) ($display['uo_nivel_ii_id'] ?? 0) ?>" data-uo-iii="<?= (int) ($display['uo_nivel_iii_id'] ?? 0) ?>" data-status="<?= htmlspecialchars($display['status']) ?>">
                         <td class="fw-semibold text-info"><?= htmlspecialchars($display['ip_address']) ?></td>
                         <td><?= htmlspecialchars($display['apelido'] ?? '-') ?></td>
-                        <td><?= htmlspecialchars($display['unidade_nome'] ?? '—') ?></td>
                         <td><?= htmlspecialchars($display['orgao_nome'] ?? '—') ?></td>
                         <td><?= htmlspecialchars($display['cliente_nome'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($display['unidade_nome'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($display['uo_nivel_i_nome'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($display['uo_nivel_ii_nome'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($display['uo_nivel_iii_nome'] ?? '—') ?></td>
                         <td><?= htmlspecialchars($display['regra_nome'] ?? 'Padrão') ?></td>
                         <td>
-                            <span class="badge <?= $display['status'] === 'ativo' ? 'bg-success' : ($display['status'] === 'pendente' ? 'bg-warning text-dark' : 'bg-secondary') ?>"><?= htmlspecialchars(strtoupper($display['status'])) ?></span>
+                            <?php $status = strtolower($display['status'] ?? 'pendente'); ?>
+                            <span class="status-chip <?= $status === 'ativo' ? 'online' : ($status === 'pendente' ? 'pending' : 'offline') ?>">
+                                <span class="bullet"></span><?= strtoupper($status) ?>
+                            </span>
                         </td>
                         <td><?= $display['ultimo_visto'] ? date('d/m/Y H:i', strtotime($display['ultimo_visto'])) : '—' ?></td>
                         <td>
                             <form method="post" action="<?= htmlspecialchars($url('painel/salvar-display'), ENT_QUOTES) ?>" class="row g-2 align-items-center">
                                 <input type="hidden" name="_token" value="<?= htmlspecialchars($token) ?>">
                                 <input type="hidden" name="display_id" value="<?= (int) $display['id'] ?>">
-                                <div class="col-12 col-lg-4">
+                                <div class="col-12 col-xl-4">
                                     <select name="unidade_id" class="form-select form-select-sm bg-dark text-white border-secondary">
                                         <option value="">Sem unidade</option>
                                         <?php foreach ($unidades as $unidade): ?>
@@ -55,7 +138,7 @@
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-12 col-lg-3">
+                                <div class="col-6 col-xl-3">
                                     <select name="regra_id" class="form-select form-select-sm bg-dark text-white border-secondary">
                                         <option value="">Padrão</option>
                                         <?php foreach ($regras as $regra): ?>
@@ -63,17 +146,17 @@
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-6 col-lg-2">
+                                <div class="col-6 col-xl-2">
                                     <select name="status" class="form-select form-select-sm bg-dark text-white border-secondary">
-                                        <option value="pendente" <?= $display['status'] === 'pendente' ? 'selected' : '' ?>>Pendente</option>
-                                        <option value="ativo" <?= $display['status'] === 'ativo' ? 'selected' : '' ?>>Ativo</option>
-                                        <option value="inativo" <?= $display['status'] === 'inativo' ? 'selected' : '' ?>>Inativo</option>
+                                        <option value="pendente" <?= $status === 'pendente' ? 'selected' : '' ?>>Pendente</option>
+                                        <option value="ativo" <?= $status === 'ativo' ? 'selected' : '' ?>>Ativo</option>
+                                        <option value="inativo" <?= $status === 'inativo' ? 'selected' : '' ?>>Inativo</option>
                                     </select>
                                 </div>
-                                <div class="col-6 col-lg-2">
+                                <div class="col-6 col-xl-2">
                                     <input type="text" name="apelido" value="<?= htmlspecialchars($display['apelido'] ?? '') ?>" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Apelido">
                                 </div>
-                                <div class="col-12 col-lg-1 text-end">
+                                <div class="col-6 col-xl-1 text-end">
                                     <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-save"></i></button>
                                 </div>
                             </form>
@@ -238,15 +321,85 @@
     </div>
 </div>
 <script>
-    $(function () {
-        $('#tabelaDisplays').DataTable({
+    document.addEventListener('DOMContentLoaded', () => {
+        const tableElement = document.getElementById('tabelaDisplays');
+        if (!tableElement || !window.jQuery) {
+            return;
+        }
+        const $ = window.jQuery;
+        const table = $('#tabelaDisplays').DataTable({
             paging: true,
             searching: true,
             info: false,
-            order: [[7, 'desc']],
+            order: [[10, 'desc']],
             language: {
                 url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
             }
         });
+
+        const filterState = {};
+        const filterInputs = document.querySelectorAll('[data-display-filter]');
+        const applyFilters = () => {
+            filterInputs.forEach((input) => {
+                filterState[input.dataset.displayFilter] = input.value;
+            });
+            table.draw();
+        };
+
+        const resetFilters = () => {
+            filterInputs.forEach((input) => {
+                input.value = '';
+                filterState[input.dataset.displayFilter] = '';
+            });
+            table.search('').draw();
+        };
+
+        const filterFn = (settings, data, dataIndex) => {
+            if (settings.nTable !== tableElement) {
+                return true;
+            }
+            const node = table.row(dataIndex).node();
+            if (!node) {
+                return true;
+            }
+            const matches = [
+                ['orgao', Number(node.dataset.orgao || 0)],
+                ['cliente', Number(node.dataset.cliente || 0)],
+                ['uo_i', Number(node.dataset.uoI || 0)],
+                ['uo_ii', Number(node.dataset.uoIi || 0)],
+                ['uo_iii', Number(node.dataset.uoIii || 0)],
+                ['status', (node.dataset.status || '').toLowerCase()]
+            ].every(([key, value]) => {
+                const selected = filterState[key];
+                if (!selected) {
+                    return true;
+                }
+                if (key === 'status') {
+                    return value === selected.toLowerCase();
+                }
+                return Number(selected) === value;
+            });
+            return matches;
+        };
+
+        window.ProFilaFilters = window.ProFilaFilters || {};
+        if (!window.ProFilaFilters.displays) {
+            window.ProFilaFilters.displays = filterFn;
+            $.fn.dataTable.ext.search.push(filterFn);
+        }
+
+        document.getElementById('aplicarFiltroPainel')?.addEventListener('click', applyFilters);
+        document.getElementById('limparFiltroPainel')?.addEventListener('click', () => {
+            resetFilters();
+        });
+        filterInputs.forEach((input) => {
+            input.addEventListener('change', () => {
+                if (input.dataset.displayFilter === 'status') {
+                    applyFilters();
+                }
+            });
+        });
+
+        resetFilters();
     });
 </script>

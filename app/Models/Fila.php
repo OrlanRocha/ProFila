@@ -5,9 +5,52 @@ namespace App\Models;
 
 class Fila extends BaseModel
 {
-    public function all(): array
+    public function all(array $filters = []): array
     {
-        $stmt = $this->db->query('SELECT f.*, u.nome AS unidade_nome FROM filas f LEFT JOIN unidades u ON u.id = f.unidade_id ORDER BY u.nome, f.nome');
+        return $this->listWithFilters($filters);
+    }
+
+    public function listWithFilters(array $filters = []): array
+    {
+        $sql = "SELECT f.*, u.nome AS unidade_nome, u.codigo AS unidade_codigo, u.uo_nivel_i_id, u.uo_nivel_ii_id, u.uo_nivel_iii_id, "
+             . "uo1.nome AS uo_nivel_i_nome, uo2.nome AS uo_nivel_ii_nome, uo3.nome AS uo_nivel_iii_nome "
+             . "FROM filas f "
+             . "LEFT JOIN unidades u ON u.id = f.unidade_id "
+             . "LEFT JOIN uo_entidades uo1 ON uo1.id = u.uo_nivel_i_id "
+             . "LEFT JOIN uo_entidades uo2 ON uo2.id = u.uo_nivel_ii_id "
+             . "LEFT JOIN uo_entidades uo3 ON uo3.id = u.uo_nivel_iii_id "
+             . "WHERE 1 = 1";
+        $params = [];
+
+        if (!empty($filters['uo_i'])) {
+            $sql .= " AND u.uo_nivel_i_id = :uo_i";
+            $params['uo_i'] = (int) $filters['uo_i'];
+        }
+        if (!empty($filters['uo_ii'])) {
+            $sql .= " AND u.uo_nivel_ii_id = :uo_ii";
+            $params['uo_ii'] = (int) $filters['uo_ii'];
+        }
+        if (!empty($filters['uo_iii'])) {
+            $sql .= " AND u.uo_nivel_iii_id = :uo_iii";
+            $params['uo_iii'] = (int) $filters['uo_iii'];
+        }
+        if (isset($filters['status']) && $filters['status'] !== '' && $filters['status'] !== 'todas') {
+            if ($filters['status'] === 'ativas') {
+                $sql .= " AND f.ativo = 1";
+            } elseif ($filters['status'] === 'inativas') {
+                $sql .= " AND f.ativo = 0";
+            }
+        }
+
+        $sql .= " ORDER BY COALESCE(u.nome, f.nome), f.nome";
+
+        if ($params) {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+        } else {
+            $stmt = $this->db->query($sql);
+        }
+
         return $stmt->fetchAll();
     }
 

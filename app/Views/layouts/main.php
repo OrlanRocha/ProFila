@@ -33,14 +33,14 @@ $isActive = static fn (string $prefix) => str_starts_with($requested, trim($pref
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5/bootstrap-4.min.css">
     <link rel="stylesheet" href="<?= htmlspecialchars($baseAssets . '/public/assets/css/app.css', ENT_QUOTES) ?>">
     <style>
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f172a, #1d4ed8 55%, #7c3aed); min-height: 100vh; }
-        .app-shell { backdrop-filter: blur(18px); background: rgba(15, 23, 42, 0.8); box-shadow: 0 35px 80px rgba(15, 23, 42, 0.55); border-radius: 28px; }
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top left, #0b1f4d 0%, #102347 35%, #081026 100%); min-height: 100vh; }
+        .app-shell { backdrop-filter: blur(24px); background: rgba(8, 17, 38, 0.88); box-shadow: 0 40px 120px rgba(7, 11, 25, 0.65); border-radius: 32px; border: 1px solid rgba(59, 130, 246, 0.22); }
         .navbar-brand span { color: #38bdf8; }
-        .sidebar-link { border-radius: 12px; transition: background .25s ease, transform .25s ease; }
-        .sidebar-link:hover { transform: translateX(4px); }
-        .sidebar-link.active { background: rgba(56, 189, 248, 0.15); color: #38bdf8 !important; }
-        main { color: #e2e8f0; }
-        footer { color: rgba(226, 232, 240, 0.65); }
+        .sidebar-link { border-radius: 14px; transition: background .25s ease, transform .25s ease; padding: 0.65rem 1rem; }
+        .sidebar-link:hover { transform: translateX(4px); background: rgba(59, 130, 246, 0.12); }
+        .sidebar-link.active { background: rgba(56, 189, 248, 0.2); color: #38bdf8 !important; box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.25); }
+        main { color: #e2e8f0; background: linear-gradient(145deg, rgba(15, 23, 42, 0.75), rgba(6, 14, 31, 0.9)); min-height: 100%; }
+        footer { color: rgba(226, 232, 240, 0.65); background: rgba(15, 23, 42, 0.6); }
     </style>
 </head>
 <body class="py-4 py-lg-5">

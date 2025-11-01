@@ -21,7 +21,18 @@ class PainelDisplay extends BaseModel
 
     public function buscarPorToken(string $token): ?array
     {
-        $stmt = $this->db->prepare('SELECT d.*, u.nome AS unidade_nome, pr.nome AS regra_nome FROM painel_displays d LEFT JOIN unidades u ON u.id = d.unidade_id LEFT JOIN painel_regras pr ON pr.id = d.regra_id WHERE d.token = :token');
+        $stmt = $this->db->prepare('SELECT d.*, u.nome AS unidade_nome, pr.nome AS regra_nome, o.nome AS orgao_nome, o.id AS orgao_id, c.nome AS cliente_nome, c.id AS cliente_id,
+            uo1.nome AS uo_nivel_i_nome, uo2.nome AS uo_nivel_ii_nome, uo3.nome AS uo_nivel_iii_nome,
+            u.uo_nivel_i_id, u.uo_nivel_ii_id, u.uo_nivel_iii_id
+            FROM painel_displays d
+            LEFT JOIN unidades u ON u.id = d.unidade_id
+            LEFT JOIN orgaos o ON o.id = u.orgao_id
+            LEFT JOIN clientes c ON c.id = u.cliente_id
+            LEFT JOIN painel_regras pr ON pr.id = d.regra_id
+            LEFT JOIN uo_entidades uo1 ON uo1.id = u.uo_nivel_i_id
+            LEFT JOIN uo_entidades uo2 ON uo2.id = u.uo_nivel_ii_id
+            LEFT JOIN uo_entidades uo3 ON uo3.id = u.uo_nivel_iii_id
+            WHERE d.token = :token');
         $stmt->execute(['token' => $token]);
         $display = $stmt->fetch();
         return $display ?: null;
@@ -29,7 +40,18 @@ class PainelDisplay extends BaseModel
 
     public function buscarPorIp(string $ip): ?array
     {
-        $stmt = $this->db->prepare('SELECT d.*, u.nome AS unidade_nome, pr.nome AS regra_nome FROM painel_displays d LEFT JOIN unidades u ON u.id = d.unidade_id LEFT JOIN painel_regras pr ON pr.id = d.regra_id WHERE d.ip_address = :ip');
+        $stmt = $this->db->prepare('SELECT d.*, u.nome AS unidade_nome, pr.nome AS regra_nome, o.nome AS orgao_nome, o.id AS orgao_id, c.nome AS cliente_nome, c.id AS cliente_id,
+            uo1.nome AS uo_nivel_i_nome, uo2.nome AS uo_nivel_ii_nome, uo3.nome AS uo_nivel_iii_nome,
+            u.uo_nivel_i_id, u.uo_nivel_ii_id, u.uo_nivel_iii_id
+            FROM painel_displays d
+            LEFT JOIN unidades u ON u.id = d.unidade_id
+            LEFT JOIN orgaos o ON o.id = u.orgao_id
+            LEFT JOIN clientes c ON c.id = u.cliente_id
+            LEFT JOIN painel_regras pr ON pr.id = d.regra_id
+            LEFT JOIN uo_entidades uo1 ON uo1.id = u.uo_nivel_i_id
+            LEFT JOIN uo_entidades uo2 ON uo2.id = u.uo_nivel_ii_id
+            LEFT JOIN uo_entidades uo3 ON uo3.id = u.uo_nivel_iii_id
+            WHERE d.ip_address = :ip');
         $stmt->execute(['ip' => $ip]);
         $display = $stmt->fetch();
         return $display ?: null;
@@ -55,12 +77,17 @@ class PainelDisplay extends BaseModel
 
     public function listarTodos(): array
     {
-        $sql = 'SELECT d.*, u.nome AS unidade_nome, o.nome AS orgao_nome, c.nome AS cliente_nome, pr.nome AS regra_nome
+        $sql = 'SELECT d.*, u.nome AS unidade_nome, o.nome AS orgao_nome, o.id AS orgao_id, c.nome AS cliente_nome, c.id AS cliente_id, pr.nome AS regra_nome,
+                       uo1.nome AS uo_nivel_i_nome, uo2.nome AS uo_nivel_ii_nome, uo3.nome AS uo_nivel_iii_nome,
+                       u.uo_nivel_i_id, u.uo_nivel_ii_id, u.uo_nivel_iii_id
                 FROM painel_displays d
                 LEFT JOIN unidades u ON u.id = d.unidade_id
                 LEFT JOIN orgaos o ON o.id = u.orgao_id
                 LEFT JOIN clientes c ON c.id = u.cliente_id
                 LEFT JOIN painel_regras pr ON pr.id = d.regra_id
+                LEFT JOIN uo_entidades uo1 ON uo1.id = u.uo_nivel_i_id
+                LEFT JOIN uo_entidades uo2 ON uo2.id = u.uo_nivel_ii_id
+                LEFT JOIN uo_entidades uo3 ON uo3.id = u.uo_nivel_iii_id
                 ORDER BY d.status DESC, d.ip_address';
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();

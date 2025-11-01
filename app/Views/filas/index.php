@@ -1,9 +1,65 @@
+<?php
+/** @var array $filas */
+/** @var array $unidades */
+/** @var array $uoI */
+/** @var array $uoII */
+/** @var array $uoIII */
+/** @var array $filters */
+/** @var callable $url */
+/** @var string $token */
+?>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1 class="h3 text-white mb-0">Filas de atendimento</h1>
-        <p class="text-secondary mb-0">Associe cada fila a uma unidade organizacional e ajuste prioridades padrão.</p>
+        <h1 class="h3 text-white mb-1">Filas de atendimento</h1>
+        <p class="text-secondary mb-0">Gerencie regras de prioridade por ponto de atendimento, unidade e nível de UO.</p>
     </div>
-    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filaModal"><i class="bi bi-plus-circle me-2"></i>Nova fila</button>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-light" href="<?= htmlspecialchars($url('painel/index'), ENT_QUOTES) ?>"><i class="bi bi-display"></i> Painéis</a>
+        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filaModal"><i class="bi bi-plus-circle me-2"></i>Nova fila</button>
+    </div>
+</div>
+<div class="filter-toolbar">
+    <form class="row g-3 align-items-end" method="get">
+        <div class="col-md-3">
+            <label class="form-label" for="filtroUoI">UO nível I</label>
+            <select class="form-select bg-dark" id="filtroUoI" name="uo_i">
+                <option value="">Todas</option>
+                <?php foreach ($uoI as $uo): ?>
+                    <option value="<?= (int) $uo['id'] ?>" <?= ($filters['uo_i'] ?? null) === (int) $uo['id'] ? 'selected' : '' ?>><?= htmlspecialchars($uo['nome']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="filtroUoII">UO nível II</label>
+            <select class="form-select bg-dark" id="filtroUoII" name="uo_ii">
+                <option value="">Todas</option>
+                <?php foreach ($uoII as $uo): ?>
+                    <option value="<?= (int) $uo['id'] ?>" <?= ($filters['uo_ii'] ?? null) === (int) $uo['id'] ? 'selected' : '' ?>><?= htmlspecialchars($uo['nome']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="filtroUoIII">UO nível III</label>
+            <select class="form-select bg-dark" id="filtroUoIII" name="uo_iii">
+                <option value="">Todas</option>
+                <?php foreach ($uoIII as $uo): ?>
+                    <option value="<?= (int) $uo['id'] ?>" <?= ($filters['uo_iii'] ?? null) === (int) $uo['id'] ? 'selected' : '' ?>><?= htmlspecialchars($uo['nome']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label" for="filtroStatus">Status</label>
+            <select class="form-select bg-dark" id="filtroStatus" name="status">
+                <option value="todas" <?= ($filters['status'] ?? 'todas') === 'todas' ? 'selected' : '' ?>>Todas</option>
+                <option value="ativas" <?= ($filters['status'] ?? 'todas') === 'ativas' ? 'selected' : '' ?>>Ativas</option>
+                <option value="inativas" <?= ($filters['status'] ?? 'todas') === 'inativas' ? 'selected' : '' ?>>Inativas</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1"><i class="bi bi-search"></i> Pesquisar</button>
+            <a class="btn btn-outline-light" href="<?= htmlspecialchars($url('filas/index'), ENT_QUOTES) ?>">Limpar</a>
+        </div>
+    </form>
 </div>
 <div class="card bg-dark border-0 shadow-sm">
     <div class="card-body">
@@ -13,6 +69,9 @@
                 <tr>
                     <th>Nome</th>
                     <th>Sigla</th>
+                    <th>UO I</th>
+                    <th>UO II</th>
+                    <th>UO III</th>
                     <th>Unidade</th>
                     <th>Prioridade padrão</th>
                     <th>Status</th>
@@ -21,9 +80,12 @@
                 </thead>
                 <tbody>
                 <?php foreach ($filas as $fila): ?>
-                    <tr data-fila='<?= json_encode($fila, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>'>
-                        <td><?= htmlspecialchars($fila['nome']) ?></td>
-                        <td><?= htmlspecialchars($fila['sigla']) ?></td>
+                    <tr data-fila='<?= json_encode($fila, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>' data-uo-i='<?= (int) ($fila['uo_nivel_i_id'] ?? 0) ?>' data-uo-ii='<?= (int) ($fila['uo_nivel_ii_id'] ?? 0) ?>' data-uo-iii='<?= (int) ($fila['uo_nivel_iii_id'] ?? 0) ?>' data-status='<?= (int) $fila['ativo'] === 1 ? 'ativo' : 'inativo' ?>'>
+                        <td class="fw-semibold text-white"><?= htmlspecialchars($fila['nome']) ?></td>
+                        <td><span class="badge bg-info bg-opacity-25 text-info"><?= htmlspecialchars($fila['sigla']) ?></span></td>
+                        <td><?= htmlspecialchars($fila['uo_nivel_i_nome'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($fila['uo_nivel_ii_nome'] ?? '—') ?></td>
+                        <td><?= htmlspecialchars($fila['uo_nivel_iii_nome'] ?? '—') ?></td>
                         <td><?= htmlspecialchars($fila['unidade_nome'] ?? '—') ?></td>
                         <td><?= (int) $fila['prioridade_padrao'] ?></td>
                         <td><?= $fila['ativo'] ? '<span class="badge text-bg-success">Ativa</span>' : '<span class="badge text-bg-secondary">Inativa</span>' ?></td>
