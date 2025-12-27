@@ -1,0 +1,129 @@
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  role_id INT NOT NULL DEFAULT 4,
+  role VARCHAR(50) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  scopes JSON NULL,
+  cpf VARCHAR(20) NULL,
+  active TINYINT(1) DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  last_login_at DATETIME NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS roles (
+  id INT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS permissions (
+  id INT PRIMARY KEY,
+  `key` VARCHAR(100) NOT NULL,
+  description VARCHAR(255) NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS role_permissions (
+  role_id INT NOT NULL,
+  permission_id INT NOT NULL,
+  PRIMARY KEY (role_id, permission_id),
+  CONSTRAINT fk_role_perm_role FOREIGN KEY (role_id) REFERENCES roles(id),
+  CONSTRAINT fk_role_perm_perm FOREIGN KEY (permission_id) REFERENCES permissions(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS user_scopes (
+  user_id INT NOT NULL,
+  uoi_id INT NOT NULL,
+  uoii_id INT NULL,
+  uoiii_id INT NULL,
+  uoiv_id INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, uoi_id, IFNULL(uoii_id, 0), IFNULL(uoiii_id, 0), IFNULL(uoiv_id, 0)),
+  CONSTRAINT fk_scope_user FOREIGN KEY (user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS auth_attempts (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(150) NOT NULL,
+  ip VARCHAR(45) NOT NULL,
+  attempts INT DEFAULT 0,
+  locked_until DATETIME NULL,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS auth_logs (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NULL,
+  email VARCHAR(150) NOT NULL,
+  ip VARCHAR(45) NOT NULL,
+  user_agent VARCHAR(255) NULL,
+  status VARCHAR(20) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_auth_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NULL,
+  action VARCHAR(100) NOT NULL,
+  target VARCHAR(100) NULL,
+  payload_json JSON NULL,
+  reason VARCHAR(255) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS queues (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  letter CHAR(2) NOT NULL,
+  policy VARCHAR(50) NOT NULL DEFAULT 'fifo',
+  scope VARCHAR(50) NULL,
+  service_id INT NULL,
+  active TINYINT(1) DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS tickets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  queue_id INT NOT NULL,
+  ticket_type_id INT NULL,
+  number INT NOT NULL,
+  letter CHAR(2) NOT NULL,
+  display VARCHAR(15) NOT NULL,
+  status VARCHAR(25) NOT NULL,
+  priority_order INT DEFAULT 0,
+  locked_by INT NULL,
+  locked_at DATETIME NULL,
+  current_point_id INT NULL,
+  service_id INT NULL,
+  attempts INT DEFAULT 0,
+  origin VARCHAR(50) DEFAULT 'RECEPTION',
+  meta_json JSON NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  called_at DATETIME NULL,
+  started_at DATETIME NULL,
+  finished_at DATETIME NULL,
+  canceled_at DATETIME NULL,
+  INDEX idx_queue_status (queue_id, status, created_at),
+  CONSTRAINT fk_tickets_queue FOREIGN KEY (queue_id) REFERENCES queues(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS ticket_events (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  ticket_id INT NOT NULL,
+  type VARCHAR(50) NOT NULL,
+  payload JSON NULL,
+  user_id INT NULL,
+  point_id INT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_events_ticket FOREIGN KEY (ticket_id) REFERENCES tickets(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS monitors (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  channel_id VARCHAR(50) NOT NULL,
+  ip VARCHAR(50) NOT NULL,
+  active TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
