@@ -10,6 +10,7 @@ use App\Repositories\RoleRepository;
 use App\Repositories\TicketRepository;
 use App\Repositories\UserRepository;
 use App\Services\AuthService;
+use App\Services\InstallerService;
 use App\Services\MonitorService;
 use App\Services\QueuePolicyService;
 use App\Services\ReportService;
@@ -92,6 +93,7 @@ class App
         $monitorService = new MonitorService($queueRepository, $ticketRepository);
         $reportService = new ReportService($reportRepository);
         $userService = new UserService($userRepository);
+        $installerService = new InstallerService();
 
         return [
             'authService' => $authService,
@@ -103,6 +105,7 @@ class App
             'queueRepository' => $queueRepository,
             'userService' => $userService,
             'roleRepository' => $roleRepository,
+            'installerService' => $installerService,
         ];
     }
 }
