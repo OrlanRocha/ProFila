@@ -1,7 +1,7 @@
 <section class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h2 class="text-2xl font-semibold">Usuários</h2>
+            <h2 class="text-2xl font-semibold">👥 Usuários</h2>
             <p class="text-gray-600">Gerencie contas, perfis e escopos organizacionais.</p>
         </div>
         <button id="btnNewUser" class="bg-indigo-600 text-white px-4 py-2 rounded">Novo usuário</button>
@@ -22,7 +22,7 @@
             <tbody>
                 <?php foreach ($users as $user): ?>
                     <tr>
-                        <td><?= $user->active ? 'Ativo' : 'Inativo' ?></td>
+                        <td><?= $user->active ? '🟢 Ativo' : '🔴 Inativo' ?></td>
                         <td><?= htmlspecialchars($user->name) ?></td>
                         <td><?= htmlspecialchars($user->email) ?></td>
                         <td><?= htmlspecialchars($user->cpf ?? '--') ?></td>

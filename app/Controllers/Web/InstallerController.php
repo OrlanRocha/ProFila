@@ -33,10 +33,22 @@ class InstallerController extends BaseController
         }
 
         $step = $request->input('step');
+        $config = $request->all();
         $ok = false;
         switch ($step) {
             case 'env':
-                $ok = $this->installer->createEnvIfMissing();
+                $ok = $this->installer->createEnvIfMissing([
+                    'APP_ENV' => $config['app_env'] ?? 'local',
+                    'APP_URL' => $config['app_url'] ?? 'http://localhost/profila',
+                    'APP_KEY' => 'base64:changeme',
+                    'DB_HOST' => $config['db_host'] ?? '127.0.0.1',
+                    'DB_PORT' => $config['db_port'] ?? '3306',
+                    'DB_NAME' => $config['db_name'] ?? 'profila',
+                    'DB_USER' => $config['db_user'] ?? 'root',
+                    'DB_PASS' => $config['db_pass'] ?? 'secret',
+                    'WS_HOST' => $config['ws_host'] ?? '127.0.0.1',
+                    'WS_PORT' => $config['ws_port'] ?? '8080',
+                ]);
                 break;
             case 'migrate':
                 $ok = $this->installer->migrate();

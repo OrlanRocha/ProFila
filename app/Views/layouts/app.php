@@ -30,7 +30,7 @@
 ?>
     <header class="bg-indigo-700 text-white p-4 shadow flex items-center justify-between">
         <div class="flex items-center space-x-3">
-            <span class="text-xl font-semibold">ProFila</span>
+            <span class="text-xl font-semibold">🎟️ ProFila</span>
         </div>
         <div class="flex items-center space-x-4">
             <span class="text-sm"><?= htmlspecialchars(Session::get('user_role') ?? 'Usuário') ?></span>
@@ -42,7 +42,7 @@
         <aside class="w-64 bg-white shadow-md min-h-screen p-4">
             <nav class="space-y-2">
                 <?php foreach ($menu as $item): ?>
-                    <a class="block px-3 py-2 rounded hover:bg-indigo-50" href="<?= $item['href'] ?>"><?= htmlspecialchars($item['label']) ?></a>
+                    <a class="block px-3 py-2 rounded hover:bg-indigo-50" href="<?= $item['href'] ?>">🔗 <?= htmlspecialchars($item['label']) ?></a>
                 <?php endforeach; ?>
             </nav>
         </aside>
