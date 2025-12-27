@@ -22,6 +22,9 @@ return function (Router $router, array $services): void {
     $router->get('/logout', fn () => (new AuthController($services['authService']))->logout());
     $router->get('/install', fn (Request $request) => (new InstallerController($services['installerService']))->show());
     $router->get('/atendimento', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->index(), $auth);
+    $router->get('/atendimento/planilhado', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->planilhado(), $auth);
+    $router->get('/atendimento/presencial', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->presencial(), $auth);
+    $router->get('/atendimento/recepcao', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->recepcao(), $auth);
     $router->get('/monitor/{channelId}', fn (Request $request, string $channelId) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->monitor($channelId), $auth);
     $router->get('/dashboards', fn (Request $request) => (new DashboardController($services['reportService']))->index(), $auth);
     $router->get('/cadastro', fn (Request $request) => (new CadastroController($services['queueRepository'], $services['userRepository']))->index(), $auth);
