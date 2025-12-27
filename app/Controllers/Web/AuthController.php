@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controllers\Web;
+
+use App\Controllers\BaseController;
+use App\Core\Request;
+use App\Core\Validator;
+use App\Services\AuthService;
+
+class AuthController extends BaseController
+{
+    public function __construct(private readonly AuthService $authService)
+    {
+    }
+
+    public function showLogin(): \App\Core\Response
+    {
+        return $this->view('auth/login', ['title' => 'Entrar'], 'auth');
+    }
+
+    public function login(Request $request): \App\Core\Response
+    {
+        $input = $request->all();
+        $errors = Validator::validate($input, [
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if ($errors) {
+            return $this->json(['ok' => false, 'msg' => 'Dados inválidos', 'errors' => $errors], 422);
+        }
+
+        $ok = $this->authService->login($input['email'], $input['password']);
+
+        return $ok
+            ? $this->json(['ok' => true, 'msg' => 'Login realizado'])
+            : $this->json(['ok' => false, 'msg' => 'Credenciais inválidas'], 401);
+    }
+
+    public function logout(): \App\Core\Response
+    {
+        $this->authService->logout();
+        return $this->json(['ok' => true, 'msg' => 'Logout realizado']);
+    }
+}
