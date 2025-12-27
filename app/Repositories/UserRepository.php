@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Core\DB;
 use App\Models\User;
+use App\Repositories\RoleRepository;
 use PDO;
 
 class UserRepository
@@ -13,6 +14,12 @@ class UserRepository
     /** @var array<int, User> */
     private static array $memoryStore = [];
     private static int $sequence = 1;
+    private RoleRepository $roles;
+
+    public function __construct(?RoleRepository $roles = null)
+    {
+        $this->roles = $roles ?? new RoleRepository();
+    }
 
     /** @return list<User> */
     public function all(): array
@@ -52,11 +59,15 @@ class UserRepository
     public function create(array $data): User
     {
         $id = self::$sequence++;
+        $roleId = (int) ($data['role_id'] ?? 4);
+        $role = $this->roles->findRole($roleId);
+        $roleName = $role?->name ?? ($data['role'] ?? 'user');
         $user = new User(
             $id,
             (string) $data['name'],
             (string) $data['email'],
-            (string) ($data['role'] ?? 'user'),
+            $roleId,
+            (string) $roleName,
             password_hash((string) $data['password'], PASSWORD_DEFAULT),
             $data['scopes'] ?? [],
             (bool) ($data['active'] ?? true),
@@ -76,7 +87,14 @@ class UserRepository
 
         $user->name = $data['name'] ?? $user->name;
         $user->email = $data['email'] ?? $user->email;
-        $user->role = $data['role'] ?? $user->role;
+        if (isset($data['role_id'])) {
+            $roleId = (int) $data['role_id'];
+            $role = $this->roles->findRole($roleId);
+            $user->roleId = $roleId;
+            $user->role = $role?->name ?? $user->role;
+        } elseif (isset($data['role'])) {
+            $user->role = (string) $data['role'];
+        }
         $user->scopes = $data['scopes'] ?? $user->scopes;
         $user->active = (bool) ($data['active'] ?? $user->active);
         $user->cpf = $data['cpf'] ?? $user->cpf;
@@ -110,7 +128,7 @@ class UserRepository
 
         try {
             $pdo = DB::connection();
-            $stmt = $pdo->query('SELECT id, name, email, role, password_hash, scopes, active, cpf FROM users LIMIT 200');
+            $stmt = $pdo->query('SELECT id, name, email, role_id, role, password_hash, scopes, active, cpf FROM users LIMIT 200');
             $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
         } catch (\Throwable) {
             $rows = [];
@@ -122,11 +140,14 @@ class UserRepository
 
         foreach ($rows as $row) {
             $scopes = $row['scopes'] ? json_decode((string) $row['scopes'], true, 512, JSON_THROW_ON_ERROR) : [];
+            $roleId = isset($row['role_id']) ? (int) $row['role_id'] : 4;
+            $role = $this->roles->findRole($roleId);
             $user = new User(
                 (int) $row['id'],
                 (string) $row['name'],
                 (string) $row['email'],
-                (string) $row['role'],
+                $roleId,
+                (string) ($role?->name ?? $row['role'] ?? 'user'),
                 (string) $row['password_hash'],
                 $scopes,
                 (bool) ($row['active'] ?? true),
@@ -149,7 +170,7 @@ class UserRepository
             'name' => 'Admin',
             'email' => 'admin@local',
             'password' => 'secret',
-            'role' => 'admin',
+            'role_id' => 1,
             'scopes' => ['*'],
         ]);
     }

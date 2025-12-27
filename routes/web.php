@@ -8,17 +8,21 @@ use App\Controllers\Web\CadastroController;
 use App\Controllers\Web\ConfigController;
 use App\Controllers\Web\DashboardController;
 use App\Controllers\Web\GerenciamentoController;
+use App\Controllers\Web\UserController;
 use App\Core\Request;
 use App\Core\Router;
+use App\Middlewares\AuthMiddleware;
 
 return function (Router $router, array $services): void {
-    $router->get('/', fn (Request $request) => (new DashboardController($services['reportService']))->index());
+    $auth = [AuthMiddleware::class];
+    $router->get('/', fn (Request $request) => (new DashboardController($services['reportService']))->index(), $auth);
     $router->get('/login', fn (Request $request) => (new AuthController($services['authService']))->showLogin());
     $router->get('/register', fn (Request $request) => (new AuthController($services['authService']))->showRegister());
-    $router->get('/atendimento', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->index());
-    $router->get('/monitor/{channelId}', fn (Request $request, string $channelId) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->monitor($channelId));
-    $router->get('/dashboards', fn (Request $request) => (new DashboardController($services['reportService']))->index());
-    $router->get('/cadastro', fn (Request $request) => (new CadastroController($services['queueRepository'], $services['userRepository']))->index());
-    $router->get('/config', fn (Request $request) => (new ConfigController($services['monitorService']))->index());
-    $router->get('/gerenciamento', fn (Request $request) => (new GerenciamentoController($services['ticketService']))->index());
+    $router->get('/atendimento', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->index(), $auth);
+    $router->get('/monitor/{channelId}', fn (Request $request, string $channelId) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->monitor($channelId), $auth);
+    $router->get('/dashboards', fn (Request $request) => (new DashboardController($services['reportService']))->index(), $auth);
+    $router->get('/cadastro', fn (Request $request) => (new CadastroController($services['queueRepository'], $services['userRepository']))->index(), $auth);
+    $router->get('/config', fn (Request $request) => (new ConfigController($services['monitorService']))->index(), $auth);
+    $router->get('/gerenciamento', fn (Request $request) => (new GerenciamentoController($services['ticketService']))->index(), $auth);
+    $router->get('/usuarios', fn (Request $request) => (new UserController($services['userRepository'], $services['userService'], $services['roleRepository']))->index(), $auth);
 };

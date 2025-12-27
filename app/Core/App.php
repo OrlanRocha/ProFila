@@ -6,6 +6,7 @@ namespace App\Core;
 
 use App\Repositories\QueueRepository;
 use App\Repositories\ReportRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\TicketRepository;
 use App\Repositories\UserRepository;
 use App\Services\AuthService;
@@ -79,7 +80,8 @@ class App
 
     private function buildServices(): array
     {
-        $userRepository = new UserRepository();
+        $roleRepository = new RoleRepository();
+        $userRepository = new UserRepository($roleRepository);
         $ticketRepository = new TicketRepository();
         $queueRepository = new QueueRepository();
         $reportRepository = new ReportRepository($ticketRepository);
@@ -100,6 +102,7 @@ class App
             'userRepository' => $userRepository,
             'queueRepository' => $queueRepository,
             'userService' => $userService,
+            'roleRepository' => $roleRepository,
         ];
     }
 }

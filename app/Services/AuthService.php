@@ -18,9 +18,17 @@ class AuthService
         $this->users = $users;
     }
 
-    public function login(string $email, string $password): bool
+    /**
+     * @return array{ok:bool,msg?:string}
+     */
+    public function login(string $email, string $password): array
     {
-        return $this->auth->attempt($email, $password);
+        if ($this->auth->isLocked($email)) {
+            return ['ok' => false, 'msg' => 'Muitas tentativas. Aguarde alguns minutos e tente novamente.'];
+        }
+
+        $ok = $this->auth->attempt($email, $password);
+        return $ok ? ['ok' => true, 'msg' => 'Login realizado'] : ['ok' => false, 'msg' => 'Credenciais inválidas'];
     }
 
     public function logout(): void
@@ -44,6 +52,7 @@ class AuthService
             return ['ok' => false, 'msg' => 'E-mail já cadastrado'];
         }
 
+        $data['role_id'] = $data['role_id'] ?? 4;
         $user = $this->users->create($data);
         return ['ok' => true, 'user' => $user];
     }

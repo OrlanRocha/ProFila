@@ -1,3 +1,4 @@
+<?php use App\Services\MenuService; use App\Repositories\RoleRepository; use App\Core\Session; ?>
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -21,20 +22,33 @@
     <script type="module" src="/assets/js/app.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen">
-    <header class="bg-indigo-700 text-white p-4 shadow">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 class="text-xl font-semibold">ProFila</h1>
-            <nav class="space-x-4">
-                <a class="hover:underline" href="/atendimento">Atendimento</a>
-                <a class="hover:underline" href="/dashboards">Dashboards</a>
-                <a class="hover:underline" href="/cadastro">Cadastros</a>
-                <a class="hover:underline" href="/config">Configuração</a>
-            </nav>
+<?php
+    $roleRepo = new RoleRepository();
+    $menuService = new MenuService($roleRepo);
+    $roleId = Session::get('user_role_id') ?: Session::get('user_role_id', null);
+    $menu = $menuService->buildMenu($roleId ?? 0);
+?>
+    <header class="bg-indigo-700 text-white p-4 shadow flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <span class="text-xl font-semibold">ProFila</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="text-sm"><?= htmlspecialchars(Session::get('user_role') ?? 'Usuário') ?></span>
+            <button data-logout class="text-sm bg-white/10 px-3 py-1 rounded border border-white/20">Sair</button>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto py-8 px-4">
-        <?= $yield ?? '' ?>
-    </main>
+    <div class="flex">
+        <aside class="w-64 bg-white shadow-md min-h-screen p-4">
+            <nav class="space-y-2">
+                <?php foreach ($menu as $item): ?>
+                    <a class="block px-3 py-2 rounded hover:bg-indigo-50" href="<?= $item['href'] ?>"><?= htmlspecialchars($item['label']) ?></a>
+                <?php endforeach; ?>
+            </nav>
+        </aside>
+        <main class="flex-1 p-6">
+            <?= $yield ?? '' ?>
+        </main>
+    </div>
 </body>
 </html>

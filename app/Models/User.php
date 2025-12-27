@@ -10,11 +10,13 @@ class User
         public int $id,
         public string $name,
         public string $email,
+        public int $roleId,
         public string $role,
         public string $passwordHash,
         public array $scopes = [],
         public bool $active = true,
-        public ?string $cpf = null
+        public ?string $cpf = null,
+        public ?\DateTimeImmutable $lastLoginAt = null
     ) {
     }
 

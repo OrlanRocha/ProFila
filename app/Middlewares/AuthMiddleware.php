@@ -14,7 +14,13 @@ class AuthMiddleware implements MiddlewareInterface
     public function handle(Request $request, callable $next): Response
     {
         if (!Session::get('user_id')) {
-            return Response::json(['ok' => false, 'msg' => 'Não autenticado'], 401);
+            $path = $request->getPath();
+            if (str_starts_with($path, '/api')) {
+                return Response::json(['ok' => false, 'msg' => 'Não autenticado'], 401);
+            }
+
+            header('Location: /login');
+            exit;
         }
 
         return $next($request);

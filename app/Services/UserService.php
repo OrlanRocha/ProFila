@@ -29,6 +29,7 @@ class UserService
             return ['ok' => false, 'msg' => 'E-mail já cadastrado'];
         }
 
+        $data['role_id'] = $data['role_id'] ?? 4;
         $user = $this->users->create($data);
         return ['ok' => true, 'user' => $user];
     }

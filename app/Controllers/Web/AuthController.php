@@ -32,11 +32,8 @@ class AuthController extends BaseController
             return $this->json(['ok' => false, 'msg' => 'Dados inválidos', 'errors' => $errors], 422);
         }
 
-        $ok = $this->authService->login($input['email'], $input['password']);
-
-        return $ok
-            ? $this->json(['ok' => true, 'msg' => 'Login realizado'])
-            : $this->json(['ok' => false, 'msg' => 'Credenciais inválidas'], 401);
+        $result = $this->authService->login($input['email'], $input['password']);
+        return $this->json($result, $result['ok'] ? 200 : 401);
     }
 
     public function showRegister(): \App\Core\Response
