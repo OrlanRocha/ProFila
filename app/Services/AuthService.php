@@ -53,7 +53,8 @@ class AuthService
         }
 
         $data['role_id'] = $data['role_id'] ?? 4;
-        $user = $this->users->create($data);
-        return ['ok' => true, 'user' => $user];
+        $this->users->create($data);
+
+        return ['ok' => true, 'msg' => 'Usuário criado com sucesso'];
     }
 }

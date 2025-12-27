@@ -14,11 +14,14 @@ class UserRepository
     /** @var array<int, User> */
     private static array $memoryStore = [];
     private static int $sequence = 1;
+    private string $storeFile;
     private RoleRepository $roles;
 
     public function __construct(?RoleRepository $roles = null)
     {
         $this->roles = $roles ?? new RoleRepository();
+        $this->storeFile = __DIR__ . '/../../storage/cache/users.json';
+        $this->loadFromFile();
     }
 
     /** @return list<User> */
@@ -75,6 +78,7 @@ class UserRepository
         );
 
         self::$memoryStore[$id] = $user;
+        $this->saveToFile();
         return $user;
     }
 
@@ -104,6 +108,7 @@ class UserRepository
         }
 
         self::$memoryStore[$id] = $user;
+        $this->saveToFile();
         return $user;
     }
 
@@ -116,6 +121,7 @@ class UserRepository
 
         $user->active = false;
         self::$memoryStore[$id] = $user;
+        $this->saveToFile();
         return true;
     }
 
@@ -173,5 +179,58 @@ class UserRepository
             'role_id' => 1,
             'scopes' => ['*'],
         ]);
+    }
+
+    private function loadFromFile(): void
+    {
+        if (!is_file($this->storeFile)) {
+            return;
+        }
+
+        $json = file_get_contents($this->storeFile);
+        $data = $json ? json_decode($json, true) : [];
+        if (!is_array($data)) {
+            return;
+        }
+
+        foreach ($data as $row) {
+            $roleId = (int) ($row['roleId'] ?? 4);
+            $role = $this->roles->findRole($roleId);
+            $user = new User(
+                (int) $row['id'],
+                (string) $row['name'],
+                (string) $row['email'],
+                $roleId,
+                (string) ($role?->name ?? $row['role'] ?? 'user'),
+                (string) $row['passwordHash'],
+                $row['scopes'] ?? [],
+                (bool) ($row['active'] ?? true),
+                $row['cpf'] ?? null
+            );
+            self::$memoryStore[$user->id] = $user;
+            self::$sequence = max(self::$sequence, $user->id + 1);
+        }
+    }
+
+    private function saveToFile(): void
+    {
+        if (!is_dir(dirname($this->storeFile))) {
+            mkdir(dirname($this->storeFile), 0777, true);
+        }
+        $payload = array_values(array_map(function (User $user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roleId' => $user->roleId,
+                'role' => $user->role,
+                'passwordHash' => $user->passwordHash,
+                'scopes' => $user->scopes,
+                'active' => $user->active,
+                'cpf' => $user->cpf,
+            ];
+        }, self::$memoryStore));
+
+        file_put_contents($this->storeFile, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
 }
