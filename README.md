@@ -66,6 +66,7 @@ O layout `app.php` carrega Tailwind, DataTables, Toastr e SweetAlert2 via CDN e 
 - Usuários padrão (teste):
   - Admin: `admin@local` / `secret`
   - Dev/Gestor: `dev@local` / `dev123`
+- Documentação complementar de schema, RBAC e telas em `docs/SCHEMA_AND_RBAC.md`.
 
 ## Próximos passos sugeridos
 - Implementar persistência real em todos os repositories utilizando `App\Core\DB` (PDO + transações com lock `locked_by/locked_at`).
