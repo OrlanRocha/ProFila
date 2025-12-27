@@ -15,6 +15,9 @@ return function (Router $router, array $services): void {
     $router->post('/api/auth/login', function (Request $request) use ($services) {
         return (new AuthController($services['authService']))->login($request);
     });
+    $router->post('/api/auth/register', function (Request $request) use ($services) {
+        return (new AuthController($services['authService']))->register($request);
+    });
 
     $router->post('/api/auth/logout', fn () => (new AuthController($services['authService']))->logout());
 
@@ -67,5 +70,11 @@ return function (Router $router, array $services): void {
         return (new ReportController($services['reportService']))->realtime($request);
     });
 
-    $router->get('/api/users', fn (Request $request) => (new UserController($services['userRepository']))->index());
+    $router->get('/api/users', fn (Request $request) => (new UserController($services['userRepository'], $services['userService']))->index());
+    $router->post('/api/users/create', function (Request $request) use ($services) {
+        return (new UserController($services['userRepository'], $services['userService']))->create($request);
+    });
+    $router->post('/api/users/update', function (Request $request) use ($services) {
+        return (new UserController($services['userRepository'], $services['userService']))->update($request);
+    });
 };

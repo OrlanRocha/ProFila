@@ -14,6 +14,7 @@ use App\Core\Router;
 return function (Router $router, array $services): void {
     $router->get('/', fn (Request $request) => (new DashboardController($services['reportService']))->index());
     $router->get('/login', fn (Request $request) => (new AuthController($services['authService']))->showLogin());
+    $router->get('/register', fn (Request $request) => (new AuthController($services['authService']))->showRegister());
     $router->get('/atendimento', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->index());
     $router->get('/monitor/{channelId}', fn (Request $request, string $channelId) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->monitor($channelId));
     $router->get('/dashboards', fn (Request $request) => (new DashboardController($services['reportService']))->index());

@@ -39,6 +39,17 @@ class AuthController extends BaseController
             : $this->json(['ok' => false, 'msg' => 'Credenciais inválidas'], 401);
     }
 
+    public function showRegister(): \App\Core\Response
+    {
+        return $this->view('auth/register', ['title' => 'Criar conta'], 'auth');
+    }
+
+    public function register(Request $request): \App\Core\Response
+    {
+        $result = $this->authService->register($request->all());
+        return $this->json($result, $result['ok'] ? 200 : 400);
+    }
+
     public function logout(): \App\Core\Response
     {
         $this->authService->logout();

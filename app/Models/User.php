@@ -12,7 +12,9 @@ class User
         public string $email,
         public string $role,
         public string $passwordHash,
-        public array $scopes = []
+        public array $scopes = [],
+        public bool $active = true,
+        public ?string $cpf = null
     ) {
     }
 

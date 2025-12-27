@@ -4,28 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Core\Auth as CoreAuth;
 use App\Core\Validator;
 use App\Repositories\UserRepository;
 
-class AuthService
+class UserService
 {
-    private CoreAuth $auth;
-    private UserRepository $users;
-    public function __construct(UserRepository $users)
+    public function __construct(private readonly UserRepository $users)
     {
-        $this->auth = new CoreAuth($users);
-        $this->users = $users;
-    }
-
-    public function login(string $email, string $password): bool
-    {
-        return $this->auth->attempt($email, $password);
-    }
-
-    public function logout(): void
-    {
-        $this->auth->logout();
     }
 
     public function register(array $data): array
@@ -46,5 +31,16 @@ class AuthService
 
         $user = $this->users->create($data);
         return ['ok' => true, 'user' => $user];
+    }
+
+    public function update(int $id, array $data): array
+    {
+        $user = $this->users->update($id, $data);
+        return $user ? ['ok' => true, 'user' => $user] : ['ok' => false, 'msg' => 'Usuário não encontrado'];
+    }
+
+    public function list(): array
+    {
+        return $this->users->all();
     }
 }

@@ -13,6 +13,7 @@ use App\Services\MonitorService;
 use App\Services\QueuePolicyService;
 use App\Services\ReportService;
 use App\Services\TicketService;
+use App\Services\UserService;
 use Dotenv\Dotenv;
 use Throwable;
 
@@ -88,6 +89,7 @@ class App
         $queuePolicyService = new QueuePolicyService($queueRepository);
         $monitorService = new MonitorService($queueRepository, $ticketRepository);
         $reportService = new ReportService($reportRepository);
+        $userService = new UserService($userRepository);
 
         return [
             'authService' => $authService,
@@ -97,6 +99,7 @@ class App
             'reportService' => $reportService,
             'userRepository' => $userRepository,
             'queueRepository' => $queueRepository,
+            'userService' => $userService,
         ];
     }
 }

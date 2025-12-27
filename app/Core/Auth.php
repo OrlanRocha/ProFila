@@ -17,12 +17,13 @@ class Auth
     {
         $user = $this->users->findByEmail($email);
 
-        if (!$user instanceof User || !$user->verifyPassword($password)) {
+        if (!$user instanceof User || !$user->active || !$user->verifyPassword($password)) {
             return false;
         }
 
         Session::set('user_id', $user->id);
         Session::set('user_role', $user->role);
+        Session::set('user_scopes', $user->scopes);
 
         return true;
     }

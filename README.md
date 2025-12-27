@@ -8,6 +8,7 @@ ProFila é um esqueleto completo para um sistema de senhas com arquitetura MVC e
 - **WebSocket (Ratchet)** para broadcast de eventos de senha e atualização de painéis.
 - **Front-end** em Tailwind (CDN), DataTables, Toastr, SweetAlert2 e módulos JS (`api.js`, `ws.js`, `app.js`).
 - **Dominio** estruturado em tickets, eventos e políticas de fila (concorrência e auditoria previstas).
+- **Autenticação e cadastro**: fluxos de login/logout e registro de usuários (API + telas).
 
 ## Estrutura de pastas
 ```
@@ -59,6 +60,7 @@ O layout `app.php` carrega Tailwind, DataTables, Toastr e SweetAlert2 via CDN e 
 - `public/assets/js/api.js`: wrapper `fetch` para JSON.
 - `public/assets/js/ws.js`: cliente WebSocket enxuto.
 - `public/assets/js/app.js`: hooks globais (logout etc.).
+- Telas de autenticação: `/login` e `/register` usam as APIs `/api/auth/login` e `/api/auth/register`.
 
 ## Próximos passos sugeridos
 - Implementar persistência real em todos os repositories utilizando `App\Core\DB` (PDO + transações com lock `locked_by/locked_at`).
