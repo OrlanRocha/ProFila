@@ -7,24 +7,25 @@ use Websocket\WsServer;
 $composerAutoload = __DIR__ . '/../vendor/autoload.php';
 if (is_file($composerAutoload)) {
     require $composerAutoload;
-} else {
-    spl_autoload_register(function (string $class): void {
-        $prefixes = [
-            'Websocket\\\\' => __DIR__ . '/',
-            'App\\\\' => __DIR__ . '/../app/',
-        ];
+}
 
-        foreach ($prefixes as $prefix => $baseDir) {
-            if (str_starts_with($class, $prefix)) {
-                $path = $baseDir . str_replace($prefix, '', $class);
-                $path = str_replace('\\\\', '/', $path) . '.php';
-                if (is_file($path)) {
-                    require $path;
-                }
+// Garante autoload das classes Websocket/App mesmo sem Composer configurado para elas
+spl_autoload_register(function (string $class): void {
+    $prefixes = [
+        'Websocket\\\\' => __DIR__ . '/',
+        'App\\\\' => __DIR__ . '/../app/',
+    ];
+
+    foreach ($prefixes as $prefix => $baseDir) {
+        if (str_starts_with($class, $prefix)) {
+            $path = $baseDir . str_replace($prefix, '', $class);
+            $path = str_replace('\\\\', '/', $path) . '.php';
+            if (is_file($path)) {
+                require $path;
             }
         }
-    });
-}
+    }
+});
 
 env();
 
