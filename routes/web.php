@@ -8,6 +8,7 @@ use App\Controllers\Web\CadastroController;
 use App\Controllers\Web\ConfigController;
 use App\Controllers\Web\DashboardController;
 use App\Controllers\Web\GerenciamentoController;
+use App\Controllers\Web\InstallerController;
 use App\Controllers\Web\UserController;
 use App\Core\Request;
 use App\Core\Router;
@@ -18,6 +19,7 @@ return function (Router $router, array $services): void {
     $router->get('/', fn (Request $request) => (new DashboardController($services['reportService']))->index(), $auth);
     $router->get('/login', fn (Request $request) => (new AuthController($services['authService']))->showLogin());
     $router->get('/register', fn (Request $request) => (new AuthController($services['authService']))->showRegister());
+    $router->get('/install', fn (Request $request) => (new InstallerController($services['installerService']))->show());
     $router->get('/atendimento', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->index(), $auth);
     $router->get('/monitor/{channelId}', fn (Request $request, string $channelId) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->monitor($channelId), $auth);
     $router->get('/dashboards', fn (Request $request) => (new DashboardController($services['reportService']))->index(), $auth);

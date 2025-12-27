@@ -10,6 +10,7 @@
     </div>
     <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded">Entrar</button>
     <p class="text-sm text-gray-600 text-center">Novo aqui? <a class="text-indigo-600" href="/register">Crie sua conta</a></p>
+    <p class="text-xs text-gray-500 text-center mt-2"><a class="underline" href="/install">Instalar</a></p>
 </form>
 <script type="module">
     import { apiPost } from '/assets/js/api.js';

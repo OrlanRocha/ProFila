@@ -8,6 +8,7 @@ use App\Controllers\Api\ReportController;
 use App\Controllers\Api\TicketController;
 use App\Controllers\Api\UserController;
 use App\Controllers\Web\AuthController;
+use App\Controllers\Web\InstallerController;
 use App\Core\Request;
 use App\Core\Router;
 use App\Middlewares\AuthMiddleware;
@@ -20,6 +21,9 @@ return function (Router $router, array $services): void {
     });
     $router->post('/api/auth/register', function (Request $request) use ($services) {
         return (new AuthController($services['authService']))->register($request);
+    });
+    $router->post('/api/install/step', function (Request $request) use ($services) {
+        return (new InstallerController($services['installerService']))->step($request);
     });
 
     $router->post('/api/auth/logout', fn () => (new AuthController($services['authService']))->logout());
