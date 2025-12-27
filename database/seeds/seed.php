@@ -65,4 +65,15 @@ $pdo->prepare('INSERT INTO users (name, email, cpf, role_id, role, password_hash
         'scopes' => json_encode(['*'], JSON_THROW_ON_ERROR),
     ]);
 
+$pdo->prepare('INSERT INTO users (name, email, cpf, role_id, role, password_hash, scopes, active) VALUES (:name, :email, :cpf, :role_id, :role, :hash, :scopes, 1)')
+    ->execute([
+        'name' => 'Developer',
+        'email' => 'dev@local',
+        'cpf' => '111.111.111-11',
+        'role_id' => 2,
+        'role' => 'Gestor',
+        'hash' => password_hash('dev123', PASSWORD_DEFAULT),
+        'scopes' => json_encode(['*'], JSON_THROW_ON_ERROR),
+    ]);
+
 echo "Seeds executados com sucesso.\n";

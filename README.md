@@ -63,6 +63,9 @@ O layout `app.php` carrega Tailwind, DataTables, Toastr e SweetAlert2 via CDN e 
 - `public/assets/js/app.js`: hooks globais (logout etc.).
 - Telas de autenticação: `/login` e `/register` usam as APIs `/api/auth/login` e `/api/auth/register`.
 - Gestão de usuários: `/usuarios` (protegida), com DataTables, criação e ações críticas com SweetAlert.
+- Usuários padrão (teste):
+  - Admin: `admin@local` / `secret`
+  - Dev/Gestor: `dev@local` / `dev123`
 
 ## Próximos passos sugeridos
 - Implementar persistência real em todos os repositories utilizando `App\Core\DB` (PDO + transações com lock `locked_by/locked_at`).

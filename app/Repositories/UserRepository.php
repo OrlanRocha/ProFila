@@ -179,6 +179,14 @@ class UserRepository
             'role_id' => 1,
             'scopes' => ['*'],
         ]);
+
+        $this->create([
+            'name' => 'Developer',
+            'email' => 'dev@local',
+            'password' => 'dev123',
+            'role_id' => 2,
+            'scopes' => ['*'],
+        ]);
     }
 
     private function loadFromFile(): void
