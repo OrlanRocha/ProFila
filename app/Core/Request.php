@@ -11,23 +11,24 @@ class Request
         private readonly array $post,
         private readonly array $server,
         private readonly array $cookies,
-        private readonly array $files
+        private readonly array $files,
+        private readonly array $jsonBody = []
     ) {
     }
 
     public static function capture(): self
     {
-        return new self($_GET, $_POST, $_SERVER, $_COOKIE, $_FILES);
+        return new self($_GET, $_POST, $_SERVER, $_COOKIE, $_FILES, self::parseJson());
     }
 
     public function input(string $key, mixed $default = null): mixed
     {
-        return $this->post[$key] ?? $this->get[$key] ?? $default;
+        return $this->post[$key] ?? $this->get[$key] ?? $this->jsonBody[$key] ?? $default;
     }
 
     public function all(): array
     {
-        return array_merge($this->get, $this->post);
+        return array_merge($this->get, $this->post, $this->jsonBody);
     }
 
     public function getMethod(): string
@@ -49,5 +50,21 @@ class Request
         }
 
         return null;
+    }
+
+    private static function parseJson(): array
+    {
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
+        if (!str_contains($contentType, 'application/json')) {
+            return [];
+        }
+
+        $raw = file_get_contents('php://input');
+        if (!$raw) {
+            return [];
+        }
+
+        $decoded = json_decode($raw, true);
+        return is_array($decoded) ? $decoded : [];
     }
 }
