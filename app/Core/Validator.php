@@ -23,13 +23,7 @@ class Validator
                 }
 
                 if ($rule === 'email' && $value !== null) {
-                    $isValid = filter_var($value, FILTER_VALIDATE_EMAIL);
-
-                    // Permite formatos locais (ex.: dev@local) usados em ambientes internos
-                    if (!$isValid && str_contains((string) $value, '@')) {
-                        $isValid = true;
-                    }
-
+                    $isValid = is_string($value) && str_contains($value, '@');
                     if (!$isValid) {
                         $errors[$field] = 'E-mail inválido';
                     }
