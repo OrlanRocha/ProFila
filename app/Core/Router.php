@@ -50,7 +50,10 @@ class Router
             return $response;
         }
 
-        return Response::json(['ok' => false, 'msg' => 'Rota não encontrada'], 404);
+        $isApi = str_starts_with($request->getPath(), '/api');
+        return $isApi
+            ? Response::json(['ok' => false, 'msg' => 'Rota não encontrada'], 404)
+            : Response::view('errors/404', ['title' => 'Página não encontrada'], 'auth', 404);
     }
 
     private function addRoute(string $method, string $pattern, callable $handler, array $middleware): void

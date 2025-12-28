@@ -19,10 +19,16 @@ class Response
         return new self(json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $status, $headers);
     }
 
-    public static function view(string $view, array $data = [], string $layout = 'app'): self
+    public static function view(string $view, array $data = [], string $layout = 'app', int $status = 200): self
     {
         $body = View::render($view, $data, $layout);
-        return new self($body, 200, ['Content-Type' => 'text/html; charset=utf-8']);
+        return new self($body, $status, ['Content-Type' => 'text/html; charset=utf-8']);
+    }
+
+    public static function html(string $content, int $status = 200, array $headers = []): self
+    {
+        $headers = array_merge(['Content-Type' => 'text/html; charset=utf-8'], $headers);
+        return new self($content, $status, $headers);
     }
 
     public function send(): void

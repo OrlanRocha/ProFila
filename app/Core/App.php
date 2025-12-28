@@ -33,13 +33,23 @@ class App
 
     public function run(): void
     {
+        $request = Request::capture();
+
         try {
-            $request = Request::capture();
             $response = $this->router->dispatch($request);
             $response->send();
         } catch (Throwable $e) {
             Logger::log('error', $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            Response::json(['ok' => false, 'msg' => 'Erro interno'])->send();
+            $isApi = str_starts_with($request->getPath(), '/api');
+
+            $response = $isApi
+                ? Response::json(['ok' => false, 'msg' => 'Erro interno'], 500)
+                : Response::view('errors/500', [
+                    'title' => 'Erro interno',
+                    'message' => 'Tivemos um problema ao processar sua requisição. Tente novamente em instantes.',
+                ], 'auth', 500);
+
+            $response->send();
         }
     }
 
