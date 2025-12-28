@@ -27,12 +27,18 @@
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = Object.fromEntries(new FormData(form));
-        const res = await apiPost('/api/auth/register', formData);
-        if (res.ok) {
-            toastr.success('Conta criada! Faça login.');
-            window.location.href = '/login';
-        } else {
-            toastr.error(res.msg || 'Falha no cadastro');
+        try {
+            const res = await apiPost('/api/auth/register', formData);
+            if (res.ok) {
+                toastr.success(res.msg || 'Conta criada! Faça login.');
+                setTimeout(() => (window.location.href = '/login'), 400);
+            } else {
+                const details = res.errors ? Object.values(res.errors).join(' | ') : '';
+                toastr.error(res.msg || details || 'Falha no cadastro');
+            }
+        } catch (err) {
+            console.error(err);
+            toastr.error('Erro de rede ao cadastrar');
         }
     });
 </script>

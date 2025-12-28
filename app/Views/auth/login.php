@@ -19,12 +19,18 @@
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = Object.fromEntries(new FormData(form));
-        const res = await apiPost('/api/auth/login', formData);
-        if (res.ok) {
-            toastr.success('Bem-vindo!');
-            window.location.href = '/dashboards';
-        } else {
-            toastr.error(res.msg || 'Falha no login');
+        try {
+            const res = await apiPost('/api/auth/login', formData);
+            if (res.ok) {
+                toastr.success(res.msg || 'Login realizado');
+                setTimeout(() => (window.location.href = '/dashboards'), 300);
+            } else {
+                const details = res.errors ? Object.values(res.errors).join(' | ') : '';
+                toastr.error(res.msg || details || 'Falha no login');
+            }
+        } catch (err) {
+            console.error(err);
+            toastr.error('Erro de rede ao autenticar');
         }
     });
 </script>
