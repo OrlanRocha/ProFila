@@ -52,4 +52,11 @@ class AuthController extends BaseController
         $this->authService->logout();
         return $this->json(['ok' => true, 'msg' => 'Logout realizado']);
     }
+
+    public function logoutWeb(): \App\Core\Response
+    {
+        $this->authService->logout();
+        header('Location: /login');
+        exit;
+    }
 }

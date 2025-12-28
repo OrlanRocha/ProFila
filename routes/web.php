@@ -19,7 +19,7 @@ return function (Router $router, array $services): void {
     $router->get('/', fn (Request $request) => (new DashboardController($services['reportService']))->index(), $auth);
     $router->get('/login', fn (Request $request) => (new AuthController($services['authService']))->showLogin());
     $router->get('/register', fn (Request $request) => (new AuthController($services['authService']))->showRegister());
-    $router->get('/logout', fn () => (new AuthController($services['authService']))->logout());
+    $router->get('/logout', fn () => (new AuthController($services['authService']))->logoutWeb());
     $router->get('/install', fn (Request $request) => (new InstallerController($services['installerService']))->show());
     $router->get('/atendimento', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->index(), $auth);
     $router->get('/atendimento/planilhado', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->planilhado(), $auth);
