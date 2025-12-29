@@ -8,6 +8,7 @@ use App\Controllers\Web\CadastroController;
 use App\Controllers\Web\ConfigController;
 use App\Controllers\Web\DashboardController;
 use App\Controllers\Web\GerenciamentoController;
+use App\Controllers\Web\AuditoriaController;
 use App\Controllers\Web\InstallerController;
 use App\Controllers\Web\UserController;
 use App\Core\Request;
@@ -32,6 +33,7 @@ return function (Router $router, array $services): void {
     $router->get('/cadastro', fn (Request $request) => (new CadastroController($services['queueRepository'], $services['userRepository']))->index(), $auth);
     $router->get('/config', fn (Request $request) => (new ConfigController($services['monitorService']))->index(), $auth);
     $router->get('/gerenciamento', fn (Request $request) => (new GerenciamentoController($services['ticketService']))->index(), $auth);
+    $router->get('/auditoria', fn (Request $request) => (new AuditoriaController())->index(), $auth);
     $router->get('/usuarios', fn (Request $request) => (new UserController($services['userRepository'], $services['userService'], $services['roleRepository']))->index(), $auth);
     $router->get('/usuarios/novo', fn (Request $request) => (new UserController($services['userRepository'], $services['userService'], $services['roleRepository']))->createForm(), $auth);
     $router->get('/usuarios/{id}/editar', fn (Request $request, string $id) => (new UserController($services['userRepository'], $services['userService'], $services['roleRepository']))->editForm((int) $id), $auth);
