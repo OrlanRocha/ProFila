@@ -76,8 +76,13 @@ $can = function(string $perm) use ($permissions) {
         <a class="block px-3 py-2 rounded-xl hover:bg-slate-800/60" href="/atendimento">Atendimento</a>
       <?php endif; ?>
       <?php if ($can('report.view')): ?>
+        <a class="block px-3 py-2 rounded-xl hover:bg-slate-800/60" href="/monitoramento">Monitoramento</a>
         <a class="block px-3 py-2 rounded-xl hover:bg-slate-800/60" href="/dashboards">Dashboards</a>
       <?php endif; ?>
+      <a class="block px-3 py-2 rounded-xl hover:bg-slate-800/60" href="/gerenciamento">Gerenciamento</a>
+      <a class="block px-3 py-2 rounded-xl hover:bg-slate-800/60" href="/fila">Filas</a>
+      <a class="block px-3 py-2 rounded-xl hover:bg-slate-800/60" href="/prioridade">Prioridades</a>
+      <a class="block px-3 py-2 rounded-xl hover:bg-slate-800/60" href="/unidades">Unidades Organizacionais</a>
       <?php if ($can('user.view')): ?>
         <a class="block px-3 py-2 rounded-xl hover:bg-slate-800/60" href="/usuarios">Usuários</a>
       <?php endif; ?>
