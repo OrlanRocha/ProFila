@@ -18,8 +18,10 @@ return function (Router $router, array $services): void {
     $auth = [AuthMiddleware::class];
     $router->get('/', fn (Request $request) => (new DashboardController($services['reportService']))->index(), $auth);
     $router->get('/login', fn (Request $request) => (new AuthController($services['authService']))->showLogin());
+    $router->post('/login', fn (Request $request) => (new AuthController($services['authService']))->loginWeb($request));
     $router->get('/register', fn (Request $request) => (new AuthController($services['authService']))->showRegister());
     $router->get('/logout', fn () => (new AuthController($services['authService']))->logoutWeb());
+    $router->post('/logout', fn () => (new AuthController($services['authService']))->logoutWeb());
     $router->get('/install', fn (Request $request) => (new InstallerController($services['installerService']))->show());
     $router->get('/atendimento', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->index(), $auth);
     $router->get('/atendimento/planilhado', fn (Request $request) => (new AtendimentoController($services['ticketService'], $services['queuePolicyService']))->planilhado(), $auth);
@@ -31,4 +33,6 @@ return function (Router $router, array $services): void {
     $router->get('/config', fn (Request $request) => (new ConfigController($services['monitorService']))->index(), $auth);
     $router->get('/gerenciamento', fn (Request $request) => (new GerenciamentoController($services['ticketService']))->index(), $auth);
     $router->get('/usuarios', fn (Request $request) => (new UserController($services['userRepository'], $services['userService'], $services['roleRepository']))->index(), $auth);
+    $router->get('/usuarios/novo', fn (Request $request) => (new UserController($services['userRepository'], $services['userService'], $services['roleRepository']))->createForm(), $auth);
+    $router->get('/usuarios/{id}/editar', fn (Request $request, string $id) => (new UserController($services['userRepository'], $services['userService'], $services['roleRepository']))->editForm((int) $id), $auth);
 };

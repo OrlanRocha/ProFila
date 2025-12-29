@@ -21,6 +21,7 @@ class AtendimentoController extends BaseController
         return $this->view('atendimento/index', [
             'title' => 'Atendimento',
             'queues' => $this->queuePolicyService->listQueues(),
+            'points' => $this->points(),
         ]);
     }
 
@@ -68,10 +69,26 @@ class AtendimentoController extends BaseController
     public function monitor(string $channelId): \App\Core\Response
     {
         $channelState = $this->ticketService->latestByChannel($channelId);
-        return $this->view('monitor/index', [
+        return $this->view('monitor/show', [
             'title' => 'Painel em tempo real',
-            'channelId' => $channelId,
+            'channelId' => (int) $channelId,
+            'channel' => [
+                'nome' => 'Canal ' . $channelId,
+                'informativo' => 'Acompanhe as chamadas em tempo real',
+                'linhas' => 2,
+            ],
             'channelState' => $channelState,
-        ]);
+        ], 'auth');
+    }
+
+    /**
+     * @return list<array{id:int,numero_ponto:int,nome:string}>
+     */
+    private function points(): array
+    {
+        return [
+            ['id' => 1, 'numero_ponto' => 1, 'nome' => 'Guichê 01'],
+            ['id' => 2, 'numero_ponto' => 2, 'nome' => 'Guichê 02'],
+        ];
     }
 }

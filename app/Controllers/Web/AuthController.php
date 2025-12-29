@@ -36,6 +36,29 @@ class AuthController extends BaseController
         return $this->json($result, $result['ok'] ? 200 : 401);
     }
 
+    public function loginWeb(Request $request): \App\Core\Response
+    {
+        $input = $request->all();
+        $errors = Validator::validate($input, [
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if ($errors) {
+            Session::flash('error', 'Dados inválidos');
+            return $this->redirect('/login');
+        }
+
+        $result = $this->authService->login($input['email'], $input['password']);
+        if ($result['ok']) {
+            Session::flash('success', $result['msg'] ?? 'Login realizado');
+            return $this->redirect('/dashboards');
+        }
+
+        Session::flash('error', $result['msg'] ?? 'Falha no login');
+        return $this->redirect('/login');
+    }
+
     public function showRegister(): \App\Core\Response
     {
         return $this->view('auth/register', ['title' => 'Criar conta'], 'auth');
@@ -56,7 +79,7 @@ class AuthController extends BaseController
     public function logoutWeb(): \App\Core\Response
     {
         $this->authService->logout();
-        header('Location: /login');
-        exit;
+        Session::flash('success', 'Sessão encerrada');
+        return $this->redirect('/login');
     }
 }

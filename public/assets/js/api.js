@@ -1,17 +1,21 @@
-export async function apiPost(path, body = {}) {
-  const res = await fetch(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    credentials: "include",
-  });
-  return res.json();
+export async function apiGet(url) {
+  const res = await fetch(url, { credentials: "include" });
+  const data = await res.json().catch(() => ({ ok:false, msg:"Resposta inválida" }));
+  if (!res.ok && data?.msg) return data;
+  return data;
 }
 
-export async function apiGet(path) {
-  const res = await fetch(path, {
-    method: "GET",
+export async function apiPost(url, body) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF": (window.PROFILA?.csrf || "")
+    },
     credentials: "include",
+    body: JSON.stringify(body ?? {})
   });
-  return res.json();
+  const data = await res.json().catch(() => ({ ok:false, msg:"Resposta inválida" }));
+  if (!res.ok && data?.msg) return data;
+  return data;
 }

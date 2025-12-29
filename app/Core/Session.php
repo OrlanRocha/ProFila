@@ -29,6 +29,31 @@ class Session
         unset($_SESSION[$key]);
     }
 
+    public static function flash(string $key, string $message): void
+    {
+        $_SESSION['_flash'][$key] = $message;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public static function pullFlash(): array
+    {
+        $flash = $_SESSION['_flash'] ?? [];
+        unset($_SESSION['_flash']);
+        return is_array($flash) ? $flash : [];
+    }
+
+    public static function csrfToken(): string
+    {
+        $token = $_SESSION['_csrf'] ?? null;
+        if (!$token) {
+            $token = bin2hex(random_bytes(16));
+            $_SESSION['_csrf'] = $token;
+        }
+        return $token;
+    }
+
     public static function destroy(): void
     {
         session_destroy();

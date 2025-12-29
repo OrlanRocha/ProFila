@@ -32,6 +32,9 @@ class Auth
         Session::set('user_role', $user->role);
         Session::set('user_role_id', $user->roleId);
         Session::set('user_scopes', $user->scopes);
+        Session::set('user_permissions', $user->scopes);
+        Session::set('user_name', $user->name);
+        Session::set('user_email', $user->email);
         $this->registerAttempt($email, true);
 
         return true;

@@ -1,20 +1,46 @@
+<?php
+// Variáveis esperadas: $title, $content, $flash (opcional), $app (opcional)
+?>
 <!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($title) ? htmlspecialchars($title) . ' — ProFila' : 'ProFila' ?></title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script type="module" src="/assets/js/api.js"></script>
-    <script type="module" src="/assets/js/app.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title><?= htmlspecialchars($title ?? 'ProFila') ?></title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Toastr -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white shadow rounded p-8 w-full max-w-md">
-        <?= $yield ?? '' ?>
-    </div>
+<body class="bg-slate-950 text-white">
+  <script>
+    window.PROFILA = {
+      baseUrl: <?= json_encode($app['baseUrl'] ?? '') ?>,
+      wsUrl: <?= json_encode($app['wsUrl'] ?? '') ?>,
+      csrf: <?= json_encode($app['csrf'] ?? '') ?>
+    };
+  </script>
+  <?= $yield ?? $content ?? '' ?>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <script>
+    toastr.options = {
+      closeButton: true,
+      progressBar: true,
+      positionClass: "toast-bottom-right",
+      timeOut: 3500
+    };
+
+    <?php if (!empty($flash['error'] ?? null)): ?>
+      toastr.error(<?= json_encode($flash['error']) ?>);
+    <?php endif; ?>
+    <?php if (!empty($flash['success'] ?? null)): ?>
+      toastr.success(<?= json_encode($flash['success']) ?>);
+    <?php endif; ?>
+  </script>
 </body>
 </html>

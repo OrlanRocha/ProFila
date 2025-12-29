@@ -22,8 +22,48 @@ class UserController extends BaseController
     {
         return $this->view('users/index', [
             'title' => 'Usuários',
-            'users' => $this->users->all(),
-            'roles' => $this->roles->allRoles(),
         ]);
+    }
+
+    public function createForm(): \App\Core\Response
+    {
+        return $this->view('users/form', [
+            'title' => 'Novo usuário',
+            'mode' => 'create',
+            'roles' => $this->roleOptions(),
+        ]);
+    }
+
+    public function editForm(int $id): \App\Core\Response
+    {
+        $user = $this->users->findById($id);
+        if (!$user) {
+            return $this->view('errors/404', ['title' => 'Usuário não encontrado'], 'auth', 404);
+        }
+
+        return $this->view('users/form', [
+            'title' => 'Editar usuário',
+            'mode' => 'edit',
+            'editUser' => [
+                'id' => $user->id,
+                'nome' => $user->name,
+                'email' => $user->email,
+                'cpf' => $user->cpf,
+                'ativo' => $user->active ? 1 : 0,
+                'role_id' => $user->roleId,
+            ],
+            'roles' => $this->roleOptions(),
+        ]);
+    }
+
+    /**
+     * @return list<array{id:int,nome:string}>
+     */
+    private function roleOptions(): array
+    {
+        return array_map(
+            static fn($role) => ['id' => $role->id, 'nome' => $role->name],
+            $this->roles->allRoles()
+        );
     }
 }

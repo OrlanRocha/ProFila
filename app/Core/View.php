@@ -18,6 +18,7 @@ class View
         ob_start();
         extract($data);
         $yield = $content;
+        $content = $content;
         require $layoutFile;
 
         return (string) ob_get_clean();
